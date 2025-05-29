@@ -554,6 +554,11 @@ class DiscordStreamBot {
             await this.checkAllStreamers();
         });
 
+        // Resumo diário de jogos às 8h
+        cron.schedule('0 8 * * *', async () => {
+            await this.sendDailyGamesSummary();
+        });
+
         // Relatório diário às 9h
         cron.schedule('0 9 * * *', async () => {
             await this.sendDailyReport();
@@ -563,6 +568,7 @@ class DiscordStreamBot {
         setTimeout(() => this.checkAllStreamers(), 10000);
         
         console.log('✅ Monitoramento ativo!');
+        console.log('⏰ Resumo de jogos diário às 8h configurado!');
     }
 
     async checkAllStreamers() {
@@ -775,6 +781,47 @@ class DiscordStreamBot {
         };
 
         await this.sendWebhook(embed, `📊 **Relatório Diário** - Bot ativo em #${this.config.target_channel}! Use \`!shelp\` para ver comandos.`);
+    }
+
+    async sendDailyGamesSummary() {
+        console.log('🌅 Enviando resumo diário de jogos (8h)');
+        
+        const today = new Date();
+        const todayStr = today.toLocaleDateString('pt-BR', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        const embed = {
+            title: '🌅 BOM DIA! JOGOS DE HOJE',
+            description: `📅 **${todayStr}**\n\nConfira os principais jogos programados para hoje:`,
+            color: 0xff9500, // Laranja para manhã
+            timestamp: new Date().toISOString(),
+            fields: this.generateMockMatches('hoje'),
+            footer: {
+                text: 'Smart Stream Bot - Resumo Matinal'
+            },
+            thumbnail: {
+                url: 'https://cdn.discordapp.com/emojis/938415616628174849.png'
+            }
+        };
+
+        // Adicionar campo extra com dica
+        embed.fields.push({
+            name: '💡 Comandos Úteis',
+            value: '`!saovivo` - Ver streamers online\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana',
+            inline: false
+        });
+
+        try {
+            // Enviar via webhook para o canal
+            await this.sendWebhook(embed, `🌅 **Bom dia, galera!** Confira os jogos de hoje! ⚽🏀🏓`);
+            console.log('✅ Resumo diário de jogos enviado às 8h');
+        } catch (error) {
+            console.error('❌ Erro ao enviar resumo diário:', error.message);
+        }
     }
 
     // ========== HELPERS ==========

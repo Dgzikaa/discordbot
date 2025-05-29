@@ -1,127 +1,219 @@
-# 🧠 **Smart Stream Bot**
+# 🤖 Smart Stream Bot
 
-> **Bot inteligente que monitora streamers da Twitch e notifica no Discord**
+Bot Discord inteligente para monitoramento de streamers da Twitch e informações de jogos de futebol e esportes. Desenvolvido especificamente para o canal **#transmissões**.
 
-## ✨ **Funcionalidades**
+## 🎯 Funcionalidades
 
-### 🎮 **Monitoramento Inteligente**
-- 🇧🇷 **CS2 Brasil**: gaules, fallen, coldzera, taco
-- 🌍 **CS2 Internacional**: esl_csgo, blast, hltv_org  
-- ⚽ **Futebol**: casimito, loud_coringa
-- 📺 **Variety**: cellbit, bauky
+### 📺 Monitoramento de Streams
+- **Notificações automáticas** quando streamers ficam online
+- **Monitoramento 24/7** de streamers categorizados
+- **Cooldown inteligente** para evitar spam
+- **Informações detalhadas** com viewers, tempo online e links
 
-### ⚙️ **Configurações Personalizáveis**
-- 👥 **Viewers mínimos** configurável
-- ⏰ **Cooldown** entre notificações
-- 🕐 **Horários ativos** (8h às 23h)
-- 📊 **Relatórios diários** automáticos
+### 🤖 Sistema de Comandos
+- **Comandos interativos** com respostas em tempo real
+- **Prefixo único** `!s` para evitar conflitos
+- **Cooldown anti-spam** de 15 segundos
+- **Embeds bonitos** com informações organizadas
 
----
+### 📅 Automação Diária
+- **8h:** Resumo de jogos do dia
+- **9h:** Relatório de configurações
+- **A cada 3 min:** Verificação de streamers
 
-## 🚂 **Deploy GRATUITO no Railway**
+## 🤖 Comandos Disponíveis
 
-### 💰 **100% GRÁTIS** - $5 crédito mensal!
+| Comando | Descrição |
+|---------|-----------|
+| `!shelp` | Lista todos os comandos disponíveis |
+| `!saovivo` | Mostra streamers online no momento |
+| `!shoje` | Jogos programados para hoje |
+| `!samanha` | Jogos programados para amanhã |
+| `!ssemana` | Jogos dos próximos 7 dias |
+| `!sconfig` | Configurações atuais do bot |
+| `!sping` | Testa se o bot está funcionando |
+| `!sstats` | Estatísticas em tempo real |
 
-### 🚀 **Deploy em 3 Passos:**
+## 📺 Streamers Monitorados
 
-#### **1. Subir para GitHub**
-```bash
-git init
-git add .
-git commit -m "Smart Stream Bot"
-git remote add origin https://github.com/SEU_USER/smart-stream-bot.git
-git push -u origin main
+### 🇧🇷 CS2 Brasil
+- gaules, fallen, coldzera, taco
+
+### 🌍 CS2 Internacional  
+- esl_csgo, blast, hltv_org
+
+### ⚽ Futebol
+- casimito, loud_coringa, cosiq, warlillo, watos_, pagodedojorgin, dupladedoix, liraGOAT
+
+### 📺 Variety
+- cellbit, bauky
+
+## 🏆 Campeonatos Acompanhados
+
+### 🇧🇷 Nacionais
+- Libertadores, Brasileirão, Estaduais
+
+### 🌍 Internacionais
+- Mundial, Champions League, Inglês, Francês, Italiano
+
+### 🏆 Copas
+- Copa do Mundo, Copa do Brasil, Copa América
+
+## 🏅 Outros Esportes
+
+### 🏓 Tênis de Mesa
+- Hugo Calderano
+
+### 🎾 Tênis Brasileiro  
+- Bia Haddad, Thiago Monteiro
+
+### 🏀 Basquete
+- NBA
+
+### 🌟 Eventos Especiais
+- Copa do Mundo, Olimpíadas
+
+## ⚙️ Configurações
+
+### 📺 Canal Alvo
+- **#transmissões** (configurável)
+
+### ⏰ Horários Ativos
+- **8h às 23h** (monitoramento de streams)
+- **24/7** (comandos sempre disponíveis)
+
+### 🔔 Notificações
+- **@everyone:** Ativado
+- **Viewers mínimos:** 1.000
+- **Cooldown:** 30 minutos
+- **Thumbnails:** Ativadas
+
+### 🤖 Comandos
+- **Cooldown:** 15 segundos
+- **Prefixo:** `!s`
+- **Disponível para todos**
+
+## 🚀 Como Usar
+
+### 1️⃣ No Discord
+Digite qualquer comando no canal **#transmissões**:
+```
+!shelp
 ```
 
-#### **2. Deploy no Railway**
-1. Acesse [railway.app](https://railway.app)
-2. **"Deploy from GitHub repo"**
-3. Conecte sua conta GitHub
-4. Selecione este repositório
-5. **Deploy** ✅
+### 2️⃣ Exemplo de Uso
+```
+!saovivo     → Ver quem está online
+!shoje       → Jogos de hoje  
+!samanha     → Jogos de amanhã
+!ssemana     → Jogos da semana
+```
 
-#### **3. Bot Online 24/7!**
-- Deploy automático a cada `git push`
-- Logs em tempo real
-- Auto-restart se crashar
+## 🔧 Instalação e Deploy
 
----
+### 📋 Pré-requisitos
+- Node.js 18+
+- Discord Bot Token
+- Webhook URL
 
-## 🎯 **Comandos Locais**
-
+### 🛠️ Instalação Local
 ```bash
-# Testar bot
-npm test
+# Clonar repositório
+git clone https://github.com/Dgzikaa/discordbot.git
+cd discordbot
 
-# Ver configuração
-npm run config
+# Instalar dependências
+npm install
 
-# Iniciar localmente
+# Configurar variáveis
+export DISCORD_TOKEN="seu_token_aqui"
+
+# Executar
 npm start
-
-# Ver ajuda
-npm run help
 ```
 
-### ⚙️ **Personalizar Streamers**
-```bash
-# Adicionar streamer
-node smart-start.js add-streamer cs2_br loud_fallen
+### ☁️ Deploy no Railway
 
-# Remover streamer  
-node smart-start.js remove-streamer cs2_br taco
+1. **Fork este repositório**
+2. **Conecte ao Railway**
+3. **Configure variável de ambiente:**
+   - `DISCORD_TOKEN`: Token do seu bot Discord
+4. **Deploy automático** ✅
 
-# Configurar viewers mínimos
-node smart-start.js config min_viewers 5000
+### 🔗 Links Úteis
+- **Adicionar Bot:** [Link de Convite](https://discord.com/oauth2/authorize?client_id=1377675126945878157&permissions=8&integration_type=0&scope=bot)
+- **Railway:** [Deploy Grátis](https://railway.app)
+- **Discord Developer:** [Criar Bot](https://discord.com/developers/applications)
 
-# Desativar @everyone
-node smart-start.js config ping_everyone false
+## 📁 Estrutura do Projeto
+
+```
+discordbot/
+├── discord-bot.js      # Bot principal com todas as funcionalidades
+├── index.js           # Inicializador do bot
+├── package.json       # Dependências e scripts
+├── railway.json       # Configuração do Railway
+├── bot-config.json    # Configurações persistentes (auto-gerado)
+└── README.md          # Este arquivo
 ```
 
----
+## 🔄 Funcionamento Automático
 
-## 📊 **Recursos Railway Gratuitos**
+### 🌅 8h - Resumo Matinal
+```
+🌅 BOM DIA! JOGOS DE HOJE
+📅 [Data completa]
 
-- ✅ **500 horas/mês** (24/7 tranquilo)
-- ✅ **1GB RAM + 1 CPU** 
-- ✅ **1GB Storage**
-- ✅ **100GB Bandwidth**
-- ✅ **Domínio grátis**
-
----
-
-## 📝 **Configuração**
-
-O bot salva configurações em `bot-config.json`:
-
-```json
-{
-  "streamers": {
-    "cs2_br": ["gaules", "fallen", "coldzera", "taco"],
-    "cs2_international": ["esl_csgo", "blast", "hltv_org"],
-    "futebol": ["casimito", "loud_coringa"],
-    "variety": ["cellbit", "bauky"]
-  },
-  "notifications": {
-    "ping_everyone": true,
-    "min_viewers": 1000,
-    "cooldown_minutes": 30
-  }
-}
+🏆 Principais jogos do dia organizados por campeonato
+💡 Comandos úteis para o dia
 ```
 
+### 📊 9h - Relatório Técnico  
+```
+📊 Relatório Diário - Smart Bot
+📈 Estatísticas de funcionamento
+⚙️ Status das configurações
+```
+
+### 🔍 A cada 3 minutos
+- Verificação de streamers online
+- Notificações automáticas de lives
+- Controle de cooldown
+
+## 🛠️ Tecnologias
+
+- **Discord.js v14** - Biblioteca do Discord
+- **Node-cron** - Agendamento de tarefas  
+- **Axios** - Requisições HTTP
+- **Railway** - Hospedagem gratuita
+- **Twitch API** (via DecAPI) - Dados de streams
+
+## 📞 Suporte
+
+- **Problema com comandos?** → Digite `!sping` para testar
+- **Bot offline?** → Verifique logs no Railway
+- **Streamers não detectados?** → API da Twitch pode estar instável
+
+## 🎉 Recursos Especiais
+
+### 🎨 Embeds Coloridos
+- **🔴 Vermelho:** Streams ao vivo
+- **🟢 Verde:** Jogos de hoje
+- **🔵 Azul:** Jogos de amanhã  
+- **🟣 Roxo:** Jogos da semana
+- **🟠 Laranja:** Resumo matinal
+
+### 🏷️ Categorização Inteligente
+- Streamers organizados por categoria
+- Jogos agrupados por campeonato
+- Estatísticas separadas por tipo
+
+### ⚡ Performance Otimizada
+- Rate limiting para APIs
+- Cooldowns inteligentes
+- Verificações apenas em horário ativo
+- Cache de notificações
+
 ---
 
-## 🎉 **Pronto!**
-
-Seu bot inteligente está monitorando streamers 24/7 **GRÁTIS**! 
-
-**Railway** = Zero configuração + Deploy automático + $0 custo
-
----
-
-## 📞 **Suporte**
-
-- 🐛 **Bugs**: Verifique os logs no Railway Dashboard
-- ⚙️ **Config**: Use `npm run help` para ver comandos
-- 🔄 **Updates**: `git push` atualiza automaticamente 
+**🤖 Smart Stream Bot** - Desenvolvido com ❤️ para a comunidade de streams e esportes! 
