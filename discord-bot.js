@@ -541,29 +541,91 @@ class DiscordStreamBot {
     }
 
     async commandSemana(message) {
-        console.log('📅 Executando comando !ssemana');
+        console.log('📅 Executando comando !ssemana - AGENDA COMPLETA');
         
-        const loadingMsg = await message.reply('⚽ Buscando jogos da semana...');
+        const loadingMsg = await message.reply('📅 Montando agenda completa da semana...');
         
         try {
+            const agenda = await this.sportsIntegration.getWeeklySchedule();
+            
             const embed = new EmbedBuilder()
-                .setTitle('📅 JOGOS DA SEMANA')
-                .setDescription('Principais jogos dos próximos 7 dias')
-                .setColor(0x9900ff)
+                .setTitle('📅 AGENDA COMPLETA DA SEMANA')
+                .setDescription('🗓️ Todos os próximos jogos dos principais campeonatos')
+                .setColor(0x9932cc)
                 .setTimestamp()
-                .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
+                .setFooter({ text: `Smart Stream Bot - Agenda semanal completa` });
 
-            // Buscar jogos reais do futebol via API-Sports (próximos 7 dias)
-            embed.addFields({ 
-                name: '📅 Jogos da Semana', 
-                value: 'Funcionalidade em desenvolvimento.\n\n✅ Use `!shoje` para jogos de hoje com dados reais.',
-                inline: false 
+            const totalJogos = (agenda.brasileirao?.length || 0) + 
+                              (agenda.internacional?.length || 0) + 
+                              (agenda.nba?.length || 0);
+
+            if (totalJogos === 0) {
+                embed.addFields({
+                    name: '⚠️ Agenda vazia',
+                    value: 'Parece que estamos entre temporadas ou em período de pausa.\nUse `!slivescores` para verificar jogos ao vivo.',
+                    inline: false
+                });
+            } else {
+                // Resumo geral
+                embed.addFields({
+                    name: '📊 Resumo da Semana',
+                    value: `⚽ **Brasileirão:** ${agenda.brasileirao?.length || 0} jogos\n🏆 **Internacional:** ${agenda.internacional?.length || 0} jogos\n🏀 **NBA:** ${agenda.nba?.length || 0} jogos\n\n**Total:** ${totalJogos} jogos agendados`,
+                    inline: false
+                });
+
+                // Detalhes por campeonato (limitado para não sobrecarregar)
+                if (agenda.brasileirao && agenda.brasileirao.length > 0) {
+                    const primeirosJogos = agenda.brasileirao.slice(0, 3);
+                    const jogosText = primeirosJogos.map(jogo => 
+                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                    ).join('\n\n');
+                    
+                    embed.addFields({
+                        name: `⚽ Brasileirão (${agenda.brasileirao.length} jogos)`,
+                        value: jogosText + (agenda.brasileirao.length > 3 ? `\n\n... e mais ${agenda.brasileirao.length - 3} jogos` : ''),
+                        inline: true
+                    });
+                }
+
+                if (agenda.internacional && agenda.internacional.length > 0) {
+                    const primeirosJogos = agenda.internacional.slice(0, 3);
+                    const jogosText = primeirosJogos.map(jogo => 
+                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
+                    ).join('\n\n');
+                    
+                    embed.addFields({
+                        name: `🏆 Internacional (${agenda.internacional.length} jogos)`,
+                        value: jogosText + (agenda.internacional.length > 3 ? `\n\n... e mais ${agenda.internacional.length - 3} jogos` : ''),
+                        inline: true
+                    });
+                }
+
+                if (agenda.nba && agenda.nba.length > 0) {
+                    const primeirosJogos = agenda.nba.slice(0, 3);
+                    const jogosText = primeirosJogos.map(jogo => 
+                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                    ).join('\n\n');
+                    
+                    embed.addFields({
+                        name: `🏀 NBA (${agenda.nba.length} jogos)`,
+                        value: jogosText + (agenda.nba.length > 3 ? `\n\n... e mais ${agenda.nba.length - 3} jogos` : ''),
+                        inline: true
+                    });
+                }
+            }
+
+            // Comandos úteis
+            embed.addFields({
+                name: '💡 Comandos Úteis',
+                value: '`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos jogos\n`!stime [nome]` - Buscar time\n`!shoje` - Jogos de hoje',
+                inline: false
             });
 
-            await loadingMsg.edit({ content: null, embeds: [embed] });
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
         } catch (error) {
-            console.error('❌ Erro comando semana:', error.message);
-            await loadingMsg.edit({ content: '❌ Erro ao buscar jogos da semana. Tente novamente.' });
+            console.error('❌ Erro no comando semana:', error);
+            await loadingMsg.edit('❌ Erro ao montar agenda da semana. Tente novamente.');
         }
     }
 
@@ -1468,31 +1530,31 @@ class DiscordStreamBot {
 
             let hasAnyGames = false;
 
-            // Brasileirão
+            // Brasileirão - MOSTRAR TODOS OS 15 JOGOS
             if (proximosJogos.brasileirao && proximosJogos.brasileirao.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.brasileirao.slice(0, 5);
+                const jogos = proximosJogos.brasileirao.slice(0, 15); // Máximo 15 jogos
                 const jogosText = jogos.map(jogo => 
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: '⚽ Brasileirão - Próximos Jogos',
+                    name: `⚽ Brasileirão - Próximos Jogos (${jogos.length})`,
                     value: jogosText,
                     inline: false
                 });
             }
 
-            // Premier League
-            if (proximosJogos.premierLeague && proximosJogos.premierLeague.length > 0) {
+            // Campeonatos Internacionais
+            if (proximosJogos.internacional && proximosJogos.internacional.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.premierLeague.slice(0, 5);
+                const jogos = proximosJogos.internacional.slice(0, 5);
                 const jogosText = jogos.map(jogo => 
-                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Próximos Jogos',
+                    name: `🏆 Campeonatos Internacionais (${jogos.length})`,
                     value: jogosText,
                     inline: false
                 });
@@ -1507,7 +1569,7 @@ class DiscordStreamBot {
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: '🏀 NBA - Próximos Jogos',
+                    name: `🏀 NBA - Próximos Jogos (${jogos.length})`,
                     value: jogosText,
                     inline: false
                 });
@@ -1590,83 +1652,6 @@ class DiscordStreamBot {
         } catch (error) {
             console.error('❌ Erro no comando searchteam:', error);
             await loadingMsg.edit('❌ Erro ao buscar time. Tente novamente.');
-        }
-    }
-
-    // COMANDO: !ssemana - AGENDA COMPLETA DA SEMANA
-    async commandSemana(message) {
-        console.log('📅 Executando comando !ssemana - AGENDA COMPLETA');
-        
-        const loadingMsg = await message.reply('📅 Montando agenda completa da semana...');
-        
-        try {
-            const agenda = await this.sportsIntegration.getWeeklySchedule();
-            
-            const embed = new EmbedBuilder()
-                .setTitle('📅 AGENDA COMPLETA DA SEMANA')
-                .setDescription('🗓️ Todos os próximos jogos dos principais campeonatos')
-                .setColor(0x9932cc)
-                .setTimestamp()
-                .setFooter({ text: `Smart Stream Bot - Agenda semanal completa` });
-
-            const totalJogos = (agenda.brasileirao?.length || 0) + 
-                              (agenda.premierLeague?.length || 0) + 
-                              (agenda.nba?.length || 0);
-
-            if (totalJogos === 0) {
-                embed.fields.push({
-                    name: '⚠️ Agenda vazia',
-                    value: 'Parece que estamos entre temporadas ou em período de pausa.\nUse `!slivescores` para verificar jogos ao vivo.',
-                    inline: false
-                });
-            } else {
-                // Resumo geral
-                embed.fields.push({
-                    name: '📊 Resumo da Semana',
-                    value: `⚽ **Brasileirão:** ${agenda.brasileirao?.length || 0} jogos\n🏴󠁧󠁢󠁥󠁮󠁧󠁿 **Premier League:** ${agenda.premierLeague?.length || 0} jogos\n🏀 **NBA:** ${agenda.nba?.length || 0} jogos\n\n**Total:** ${totalJogos} jogos agendados`,
-                    inline: false
-                });
-
-                // Detalhes por campeonato (limitado para não sobrecarregar)
-                if (agenda.brasileirao && agenda.brasileirao.length > 0) {
-                    const primeirosJogos = agenda.brasileirao.slice(0, 3);
-                    const jogosText = primeirosJogos.map(jogo => 
-                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
-                    ).join('\n\n');
-                    
-                    embed.fields.push({
-                        name: `⚽ Brasileirão (${agenda.brasileirao.length} jogos)`,
-                        value: jogosText + (agenda.brasileirao.length > 3 ? `\n\n... e mais ${agenda.brasileirao.length - 3} jogos` : ''),
-                        inline: true
-                    });
-                }
-
-                if (agenda.nba && agenda.nba.length > 0) {
-                    const primeirosJogos = agenda.nba.slice(0, 3);
-                    const jogosText = primeirosJogos.map(jogo => 
-                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
-                    ).join('\n\n');
-                    
-                    embed.fields.push({
-                        name: `🏀 NBA (${agenda.nba.length} jogos)`,
-                        value: jogosText + (agenda.nba.length > 3 ? `\n\n... e mais ${agenda.nba.length - 3} jogos` : ''),
-                        inline: true
-                    });
-                }
-            }
-
-            // Comandos úteis
-            embed.fields.push({
-                name: '💡 Comandos Úteis',
-                value: '`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos jogos\n`!stime [nome]` - Buscar time\n`!shoje` - Jogos de hoje',
-                inline: false
-            });
-
-            await loadingMsg.edit({ content: '', embeds: [embed] });
-
-        } catch (error) {
-            console.error('❌ Erro no comando semana:', error);
-            await loadingMsg.edit('❌ Erro ao montar agenda da semana. Tente novamente.');
         }
     }
 

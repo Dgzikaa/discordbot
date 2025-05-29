@@ -291,8 +291,8 @@ class SportsIntegration {
                     return false;
                 }).sort((a, b) => new Date(a.data_realizacao_iso) - new Date(b.data_realizacao_iso));
 
-                // Pegar os próximos 10 jogos
-                futureGames.slice(0, 10).forEach(game => {
+                // Pegar os próximos 15 jogos
+                futureGames.slice(0, 15).forEach(game => {
                     upcomingGames.push({
                         time: new Date(game.data_realizacao_iso).toLocaleTimeString('pt-BR', { 
                             hour: '2-digit', 
@@ -526,14 +526,143 @@ class SportsIntegration {
         return results;
     }
 
+    // ========== PRÓXIMOS JOGOS (PARA AGENDA SEMANAL) ==========
+
+    async getUpcomingNBA() {
+        console.log('🏀 Buscando próximos jogos da NBA (APENAS DADOS REAIS)...');
+        
+        // Buscar próximos jogos da NBA nos próximos 7 dias
+        const results = [];
+        const today = new Date();
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            try {
+                const response = await fetch(`https://api.api-sports.io/v1/fixtures?league=12&season=2024-2025&date=${dateStr}`, {
+                    headers: {
+                        'X-RapidAPI-Key': 'live_4eb3484689f6c8a327103f30947bc9',
+                        'X-RapidAPI-Host': 'api.api-sports.io'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.response && data.response.length > 0) {
+                        const games = data.response.slice(0, 5).map(fixture => ({ // Máximo 5 por dia
+                            time: new Date(fixture.fixture.date).toLocaleTimeString('pt-BR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                            }),
+                            date: new Date(fixture.fixture.date).toLocaleDateString('pt-BR'),
+                            homeTeam: fixture.teams.home.name,
+                            awayTeam: fixture.teams.away.name,
+                            status: this.translateStatusApiSports(fixture.fixture.status.short),
+                            league: 'NBA',
+                            venue: fixture.fixture.venue.name,
+                            id: fixture.fixture.id
+                        }));
+                        
+                        results.push(...games);
+                    }
+                }
+            } catch (error) {
+                console.log(`❌ Erro ao buscar NBA para ${dateStr}:`, error.message);
+            }
+        }
+
+        if (results.length > 0) {
+            console.log(`✅ Encontrados ${results.length} próximos jogos da NBA!`);
+            return results.slice(0, 10); // Máximo 10 jogos totais
+        }
+
+        console.log('⚠️ Nenhum próximo jogo da NBA encontrado');
+        return [];
+    }
+
+    async getUpcomingInternationalFootball() {
+        console.log('🏆 Buscando próximos jogos internacionais (APENAS DADOS REAIS)...');
+        
+        const championships = [
+            { league: 39, name: 'Premier League' },
+            { league: 140, name: 'La Liga' },
+            { league: 135, name: 'Serie A' },
+            { league: 2, name: 'Champions League' }
+        ];
+
+        const results = [];
+        const today = new Date();
+        
+        for (let i = 0; i < 7; i++) { // Próximos 7 dias
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            for (const championship of championships.slice(0, 2)) { // Só 2 ligas principais
+                try {
+                    const response = await fetch(`https://api.api-sports.io/v1/fixtures?league=${championship.league}&season=2024&date=${dateStr}`, {
+                        headers: {
+                            'X-RapidAPI-Key': 'live_4eb3484689f6c8a327103f30947bc9',
+                            'X-RapidAPI-Host': 'api.api-sports.io'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.response && data.response.length > 0) {
+                            const games = data.response.slice(0, 3).map(fixture => ({ // Máximo 3 por liga por dia
+                                time: new Date(fixture.fixture.date).toLocaleTimeString('pt-BR', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                }),
+                                date: new Date(fixture.fixture.date).toLocaleDateString('pt-BR'),
+                                homeTeam: fixture.teams.home.name,
+                                awayTeam: fixture.teams.away.name,
+                                status: this.translateStatusApiSports(fixture.fixture.status.short),
+                                league: championship.name,
+                                venue: fixture.fixture.venue.name,
+                                id: fixture.fixture.id
+                            }));
+                            
+                            results.push(...games);
+                        }
+                    }
+                } catch (error) {
+                    console.log(`❌ Erro ao buscar ${championship.name} para ${dateStr}:`, error.message);
+                }
+            }
+        }
+
+        if (results.length > 0) {
+            console.log(`✅ Encontrados ${results.length} próximos jogos internacionais!`);
+            return results.slice(0, 8); // Máximo 8 jogos internacionais
+        }
+
+        console.log('⚠️ Nenhum próximo jogo internacional encontrado');
+        return [];
+    }
+
     async getWeeklySchedule() {
-        console.log('📅 Buscando agenda da semana (APENAS DADOS REAIS)...');
+        console.log('📅 Buscando agenda da semana COMPLETA (TODOS OS ESPORTES)...');
         
         const results = {
+            // Brasileirão (sempre mostrar - DADOS REAIS)
             brasileirao: await this.getUpcomingBrasileirao(),
-            premierLeague: [], // Só se API estiver funcionando
-            nba: [] // Só se API estiver funcionando
+            
+            // NBA (próximos jogos da semana)
+            nba: await this.getUpcomingNBA(),
+            
+            // Campeonatos internacionais (próximos jogos da semana)
+            internacional: await this.getUpcomingInternationalFootball(),
+            
+            // Placeholders para outros esportes
+            tennis: [], // Implementar quando tiver API
+            nfl: []     // Implementar quando tiver API
         };
+        
+        console.log(`📊 Agenda completa: ${results.brasileirao.length} Brasileirão, ${results.nba.length} NBA, ${results.internacional.length} Internacional`);
         
         return results;
     }
