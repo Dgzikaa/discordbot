@@ -1,15 +1,16 @@
 #!/bin/sh
 
 # Configurar variáveis de ambiente
-export CS2_SERVICE_PORT=5000
 export NODE_ENV=production
 export PORT=3000
 
-echo "Starting CS2 Service on port $CS2_SERVICE_PORT..."
-cd /app/cs2-service && python app.py &
+echo "=== RAILWAY DEBUG START ==="
+echo "PWD: $(pwd)"
+echo "PORT: $PORT"
+echo "NODE_ENV: $NODE_ENV"
+echo "Files in /app:"
+ls -la /app/
+echo "=== Starting Discord Bot with HTTP server on port $PORT ==="
 
-echo "Waiting for CS2 service to start..."
-sleep 5
-
-echo "Starting Discord Bot with HTTP server on port $PORT..."
+# Executar apenas o Node.js por enquanto para testar healthcheck
 cd /app && node index.js
