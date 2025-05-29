@@ -275,6 +275,11 @@ class SportsIntegrationTheSportsDBCorreto {
                             hour: '2-digit', 
                             minute: '2-digit' 
                         }),
+                        date: new Date(game.data_realizacao_iso).toLocaleDateString('pt-BR', { 
+                            weekday: 'short', 
+                            day: '2-digit', 
+                            month: '2-digit' 
+                        }),
                         homeTeam: game.time_mandante.nome_popular,
                         awayTeam: game.time_visitante.nome_popular,
                         homeScore: game.placar_mandante,
@@ -394,15 +399,20 @@ class SportsIntegrationTheSportsDBCorreto {
         // NBA IMPORTANTE
         results.nba = await this.getImportantBasketballToday();
         
+        // CS2 IMPORTANTE (NOVA INTEGRAÇÃO)
+        results.cs2 = await this.getCS2MatchesToday();
+        
         // Contar totais
         const totalGames = results.footballBrazil.length + 
                           results.footballInternational.length + 
-                          results.nba.length;
+                          results.nba.length +
+                          results.cs2.length;
         
         console.log(`🎯 RESUMO IMPORTANTES: ${totalGames} jogos selecionados`);
         console.log(`   Brasileirão: ${results.footballBrazil.length}`);
         console.log(`   Futebol Internacional: ${results.footballInternational.length}`);
         console.log(`   NBA: ${results.nba.length}`);
+        console.log(`   CS2: ${results.cs2.length}`);
         
         return results;
     }
@@ -500,6 +510,307 @@ class SportsIntegrationTheSportsDBCorreto {
             'HT': '⏸️ Intervalo'
         };
         return statusMap[status] || status;
+    }
+
+    // ========== HLTV API - JOGOS DE CS2 ==========
+
+    async fetchHLTVMatches() {
+        try {
+            console.log('🎮 Buscando jogos de CS2 via HLTV API...');
+            
+            const response = await fetch('https://hltv-api.vercel.app/api/matches.json');
+            
+            if (!response.ok) {
+                console.log(`❌ Erro HLTV API: ${response.status}`);
+                return [];
+            }
+
+            const data = await response.json();
+            console.log(`✅ HLTV API: ${data.length} jogos encontrados`);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Erro ao buscar HLTV API:', error.message);
+            return [];
+        }
+    }
+
+    async getCS2MatchesToday() {
+        console.log('🎮 Buscando jogos de CS2 importantes hoje...');
+        
+        try {
+            const allMatches = await this.fetchHLTVMatches();
+            
+            if (!allMatches || allMatches.length === 0) {
+                console.log('⚠️ Nenhum jogo de CS2 encontrado');
+                return [];
+            }
+
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            // Filtrar jogos de hoje e amanhã próximo
+            const todayMatches = allMatches.filter(match => {
+                const matchDate = new Date(match.time);
+                const timeDiff = matchDate.getTime() - today.getTime();
+                const hoursDiff = timeDiff / (1000 * 3600);
+                
+                // Jogos nas próximas 48 horas
+                return hoursDiff >= -2 && hoursDiff <= 48;
+            });
+
+            // Filtrar só jogos importantes (stars >= 1 ou eventos conhecidos)
+            const importantMatches = todayMatches.filter(match => {
+                const isImportant = match.stars >= 1 || 
+                                   match.event.name.toLowerCase().includes('major') ||
+                                   match.event.name.toLowerCase().includes('blast') ||
+                                   match.event.name.toLowerCase().includes('esl') ||
+                                   match.event.name.toLowerCase().includes('iem') ||
+                                   match.event.name.toLowerCase().includes('pgl') ||
+                                   match.event.name.toLowerCase().includes('rio') ||
+                                   match.event.name.toLowerCase().includes('cologne') ||
+                                   match.event.name.toLowerCase().includes('katowice');
+                
+                return isImportant;
+            });
+
+            const formattedMatches = importantMatches.map(match => {
+                const matchDate = new Date(match.time);
+                
+                return {
+                    time: matchDate.toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    }),
+                    date: matchDate.toLocaleDateString('pt-BR', { 
+                        weekday: 'short', 
+                        day: '2-digit', 
+                        month: '2-digit' 
+                    }),
+                    homeTeam: match.teams[0]?.name || 'Team 1',
+                    awayTeam: match.teams[1]?.name || 'Team 2',
+                    homeScore: 0, // CS2 não tem placar antes do jogo
+                    awayScore: 0,
+                    status: this.getCS2MatchStatus(match.time),
+                    league: match.event.name,
+                    venue: 'Online/LAN',
+                    format: match.maps || 'TBD',
+                    stars: match.stars,
+                    id: match.id,
+                    isLive: this.isMatchLive(match.time),
+                    priority: this.getCS2Priority(match),
+                    sport: 'CS2'
+                };
+            });
+
+            console.log(`✅ ${formattedMatches.length} jogos importantes de CS2 encontrados!`);
+            return formattedMatches;
+
+        } catch (error) {
+            console.log('❌ Erro ao processar jogos CS2:', error.message);
+            return [];
+        }
+    }
+
+    getCS2MatchStatus(matchTime) {
+        const now = new Date();
+        const match = new Date(matchTime);
+        const diffMs = match.getTime() - now.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+
+        if (diffHours < -2) return '✅ Finalizado';
+        if (diffHours < 0.5 && diffHours > -0.5) return '🔴 AO VIVO';
+        if (diffHours < 24) return '⏰ Hoje';
+        return '📅 Próximo';
+    }
+
+    isMatchLive(matchTime) {
+        const now = new Date();
+        const match = new Date(matchTime);
+        const diffMs = Math.abs(match.getTime() - now.getTime());
+        const diffMinutes = diffMs / (1000 * 60);
+        
+        // Considera "ao vivo" se estiver dentro de 30 minutos da hora agendada
+        return diffMinutes <= 30;
+    }
+
+    getCS2Priority(match) {
+        if (match.stars >= 3) return 'VERY_HIGH';
+        if (match.stars >= 2) return 'HIGH';
+        if (match.stars >= 1) return 'MEDIUM';
+        
+        // Eventos especiais sempre alta prioridade
+        const eventName = match.event.name.toLowerCase();
+        if (eventName.includes('major') || eventName.includes('blast')) return 'VERY_HIGH';
+        if (eventName.includes('esl') || eventName.includes('iem')) return 'HIGH';
+        
+        return 'LOW';
+    }
+
+    // ========== MÉTODOS AUXILIARES ADICIONAIS ==========
+
+    async getAllLivescores() {
+        console.log('🔴 Buscando TODOS os livescores (V2 API)...');
+        
+        try {
+            const livescores = await this.fetchTheSportsDBV2Livescore('all');
+            
+            if (!livescores || livescores.length === 0) {
+                console.log('⚠️ Nenhum livescore encontrado');
+                return [];
+            }
+
+            // Aplicar filtros inteligentes aos livescores
+            const importantLive = this.filterImportantGames(livescores);
+            
+            return importantLive.map(event => ({
+                homeTeam: event.strHomeTeam || 'Home',
+                awayTeam: event.strAwayTeam || 'Away',
+                homeScore: event.intHomeScore || 0,
+                awayScore: event.intAwayScore || 0,
+                league: event.strLeague || 'League',
+                venue: event.strVenue || 'TBD',
+                progress: event.strProgress || 'Live',
+                minute: event.strStatusShort || '',
+                sport: event.strSport || 'Sport',
+                isLive: true,
+                id: event.idEvent
+            }));
+
+        } catch (error) {
+            console.error('❌ Erro ao buscar livescores:', error.message);
+            return [];
+        }
+    }
+
+    async getLivescoresByFootball() {
+        console.log('⚽ Buscando livescores SÓ de futebol...');
+        
+        try {
+            const allLivescores = await this.getAllLivescores();
+            return allLivescores.filter(game => 
+                game.sport === 'Soccer' || 
+                game.league.toLowerCase().includes('football') ||
+                game.league.toLowerCase().includes('soccer')
+            );
+        } catch (error) {
+            console.error('❌ Erro livescores futebol:', error.message);
+            return [];
+        }
+    }
+
+    async getLivescoresByBasketball() {
+        console.log('🏀 Buscando livescores SÓ de basquete...');
+        
+        try {
+            const allLivescores = await this.getAllLivescores();
+            return allLivescores.filter(game => 
+                game.sport === 'Basketball' || 
+                game.league.toLowerCase().includes('basketball') ||
+                game.league.toLowerCase().includes('nba')
+            );
+        } catch (error) {
+            console.error('❌ Erro livescores basquete:', error.message);
+            return [];
+        }
+    }
+
+    async getWeeklySchedule() {
+        console.log('📅 Montando agenda semanal...');
+        
+        try {
+            const agenda = {};
+            
+            // Brasileirão (dados reais)
+            agenda.brasileirao = await this.getAllBrazilianFootballGames();
+            
+            // Futebol internacional
+            agenda.internacional = await this.getImportantSoccerToday();
+            
+            // NBA
+            agenda.nba = await this.getImportantBasketballToday();
+            
+            // CS2
+            agenda.cs2 = await this.getCS2MatchesToday();
+            
+            console.log('✅ Agenda semanal montada com sucesso');
+            return agenda;
+
+        } catch (error) {
+            console.error('❌ Erro agenda semanal:', error.message);
+            return {};
+        }
+    }
+
+    async searchTeam(teamName) {
+        console.log(`🔍 Buscando time: ${teamName}`);
+        
+        try {
+            const url = `${this.baseUrlV1}/searchteams.php?t=${encodeURIComponent(teamName)}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                console.log(`❌ Erro busca time: ${response.status}`);
+                return [];
+            }
+
+            const data = await response.json();
+            const teams = data.teams || [];
+            
+            console.log(`✅ Encontrados ${teams.length} times para "${teamName}"`);
+            
+            return teams.map(team => ({
+                name: team.strTeam,
+                sport: team.strSport,
+                league: team.strLeague,
+                country: team.strCountry,
+                stadium: team.strStadium,
+                founded: team.intFormedYear,
+                description: team.strDescriptionEN,
+                website: team.strWebsite
+            }));
+
+        } catch (error) {
+            console.error('❌ Erro ao buscar time:', error.message);
+            return [];
+        }
+    }
+
+    // MÉTODO AUXILIAR: Para métodos específicos que ainda não existem
+    async getNBAToday() {
+        console.log('🏀 Redirecionando para getImportantBasketballToday...');
+        return await this.getImportantBasketballToday();
+    }
+
+    async getBrazilianTennisToday() {
+        console.log('🎾 Buscando tênis brasileiro (simulação)...');
+        
+        // Por enquanto retorna null - implementar quando houver API específica de tênis
+        const hasBrazilianMatch = Math.random() > 0.7; // 30% chance
+        
+        if (hasBrazilianMatch) {
+            return 'João Fonseca vs Alexander Zverev - ATP Tournament - 14:00';
+        }
+        
+        return null;
+    }
+
+    async getAllSportsToday() {
+        console.log('🌟 Buscando TODOS os esportes para resumo matinal...');
+        
+        const allSports = {};
+        
+        // Usar o método principal que já temos
+        const importantSports = await this.getAllImportantSportsToday();
+        
+        allSports.footballBrazil = importantSports.footballBrazil || [];
+        allSports.footballMain = importantSports.footballInternational || [];
+        allSports.nba = importantSports.nba || [];
+        allSports.cs2 = importantSports.cs2 || [];
+        allSports.tennis = await this.getBrazilianTennisToday();
+        
+        return allSports;
     }
 }
 

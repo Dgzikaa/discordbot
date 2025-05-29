@@ -212,6 +212,7 @@ class DiscordStreamBot {
         console.log('\n🏆 ESPORTES MONITORADOS (THESPORTSDB PREMIUM):');
         console.log('⚽ Futebol: Brasileirão Série A, Premier League, La Liga, Serie A, Champions League');
         console.log('🏀 Basquete: NBA (todos os jogos), NBB brasileiro');
+        console.log('🎮 CS2: Principais campeonatos (HLTV API)');
         console.log('🎾 Tênis: Só brasileiros (João Fonseca, Bia Haddad Maia, etc.)');
         console.log('🏐 Volleyball: FIVB, ligas internacionais');
         
@@ -262,6 +263,9 @@ class DiscordStreamBot {
         console.log('📊 DADOS: 2025 reais + livescores em tempo real');
         console.log('🎯 FILTROS: Brasileiros priorizados, só principais campeonatos');
         console.log('');
+        console.log('🎮 CS2 ESPORTS:');
+        console.log('!scs2 - Todos os jogos de CS2 (HLTV API)');
+        console.log('');
     }
 
     // ========== SISTEMA DE COMANDOS ==========
@@ -301,6 +305,10 @@ class DiscordStreamBot {
                     return await this.commandProximos(message);
                 case '!ssemana':
                     return await this.commandSemana(message);
+                
+                // Comando específico para CS2
+                case '!scs2':
+                    return await this.commandCS2(message);
                 
                 // Comandos de sistema
                 case '!shelp':
@@ -485,6 +493,21 @@ class DiscordStreamBot {
                 }
             }
 
+            // 5. CS2 ESPORTS IMPORTANTES - NOVO
+            const cs2Games = await this.sportsIntegration.getCS2MatchesToday();
+            if (cs2Games.length > 0) {
+                const cs2Text = cs2Games.slice(0, 3).map(game => {
+                    let stars = '';
+                    if (game.stars >= 3) stars = '⭐⭐⭐';
+                    else if (game.stars >= 2) stars = '⭐⭐';
+                    else if (game.stars >= 1) stars = '⭐';
+                    
+                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n${stars} **${game.homeTeam} x ${game.awayTeam}**\n🏆 ${game.league}`;
+                }).join('\n\n');
+                embed.addFields({ name: '🎮 CS2 ESPORTS', value: cs2Text, inline: false });
+                hasAnyGames = true;
+            }
+
             if (!hasAnyGames) {
                 embed.addFields({ 
                     name: '😴 Dia calmo', 
@@ -573,9 +596,10 @@ class DiscordStreamBot {
                 // Detalhes por campeonato (limitado para não sobrecarregar)
                 if (agenda.brasileirao && agenda.brasileirao.length > 0) {
                     const primeirosJogos = agenda.brasileirao.slice(0, 5); // Mostra 5 como preview
-                    const jogosText = primeirosJogos.map(jogo => 
-                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
-                    ).join('\n\n');
+                    const jogosText = primeirosJogos.map(jogo => {
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`;
+                    }).join('\n\n');
                     
                     embed.addFields({
                         name: `⚽ Brasileirão (${agenda.brasileirao.length} jogos)`,
@@ -586,9 +610,10 @@ class DiscordStreamBot {
 
                 if (agenda.internacional && agenda.internacional.length > 0) {
                     const primeirosJogos = agenda.internacional.slice(0, 5); // Mostra 5 como preview
-                    const jogosText = primeirosJogos.map(jogo => 
-                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
-                    ).join('\n\n');
+                    const jogosText = primeirosJogos.map(jogo => {
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`;
+                    }).join('\n\n');
                     
                     embed.addFields({
                         name: `🏆 Internacional (${agenda.internacional.length} jogos)`,
@@ -599,9 +624,10 @@ class DiscordStreamBot {
 
                 if (agenda.nba && agenda.nba.length > 0) {
                     const primeirosJogos = agenda.nba.slice(0, 5); // Mostra 5 como preview
-                    const jogosText = primeirosJogos.map(jogo => 
-                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
-                    ).join('\n\n');
+                    const jogosText = primeirosJogos.map(jogo => {
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`;
+                    }).join('\n\n');
                     
                     embed.addFields({
                         name: `🏀 NBA (${agenda.nba.length} jogos)`,
@@ -682,6 +708,11 @@ class DiscordStreamBot {
                         inline: false 
                     },
                     { 
+                        name: '🎮 CS2 ESPORTS', 
+                        value: '`!scs2` - 🎮 **Todos os jogos de CS2** (HLTV API)', 
+                        inline: false 
+                    },
+                    { 
                         name: '🔍 BUSCA DE TIMES', 
                         value: '`!stime [nome]` - 🔎 Buscar informações de time\n📝 **Exemplos**: `!stime Arsenal`, `!stime Flamengo`, `!stime Lakers`', 
                         inline: false 
@@ -703,7 +734,7 @@ class DiscordStreamBot {
                     },
                     { 
                         name: '🌟 COMANDOS MAIS USADOS', 
-                        value: '**Dia a dia**: `!shoje`, `!slivescores`\n**Planejamento**: `!sproximos`, `!ssemana`\n**Pesquisa**: `!stime Arsenal`\n**Streams**: `!saovivo`', 
+                        value: '**Dia a dia**: `!shoje`, `!slivescores`\n**Planejamento**: `!sproximos`, `!ssemana`\n**Pesquisa**: `!stime Arsenal`\n**Streams**: `!saovivo`\n**CS2**: `!scs2`', 
                         inline: false 
                     }
                 );
@@ -785,18 +816,19 @@ class DiscordStreamBot {
                 
                 brasileiraoChunks.forEach((chunk, index) => {
                     const embed = new EmbedBuilder()
-                        .setTitle(`🇧🇷 BRASILEIRÃO SÉRIE A - TODOS OS JOGOS (${index + 1}/${brasileiraoChunks.length})`)
-                        .setDescription(`📅 ${today} - Dados reais 2025 (${allBrazilianGames.length} jogos totais)`)
+                        .setTitle(`🇧🇷 BRASILEIRÃO SÉRIE A ${brasileiraoChunks.length > 1 ? `(${index + 1}/${brasileiraoChunks.length})` : ''}`)
+                        .setDescription('⚽ Dados reais do Brasileirão 2025')
                         .setColor(0x009639) // Verde Brasil
                         .setTimestamp()
-                        .setFooter({ text: `TheSportsDB Premium - Brasileirão Real 2025` });
+                        .setFooter({ text: `TheSportsDB Premium - Brasileirão Real` });
 
-                    const jogosText = chunk.map(jogo => 
-                        `⏰ **${jogo.time}** (${jogo.date}) - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV, Premiere**`
-                    ).join('\n\n');
+                    const jogosText = chunk.map(jogo => {
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`;
+                    }).join('\n\n');
                     
                     embed.addFields({
-                        name: `⚽ Jogos ${(index * 5) + 1}-${Math.min((index + 1) * 5, allBrazilianGames.length)} de ${allBrazilianGames.length}`,
+                        name: `⚽ ${chunk.length} Jogos do Brasileirão`,
                         value: jogosText,
                         inline: false
                     });
@@ -836,14 +868,8 @@ class DiscordStreamBot {
                                     .setFooter({ text: `TheSportsDB Premium - ${league}` });
 
                                 const jogosText = chunk.map(game => {
-                                    // Determinar canal baseado na liga
-                                    let canal = '📺 ESPN';
-                                    if (league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
-                                    else if (league.includes('Premier')) canal = '📺 **ESPN, Star+**';
-                                    else if (league.includes('La Liga')) canal = '📺 **ESPN**';
-                                    else if (league.includes('Serie A')) canal = '📺 **ESPN**';
-                                    
-                                    return `⏰ **${game.time}** - ${game.status}\n🏆 **${game.homeTeam} x ${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}\n${canal}`;
+                                    // Usar a data real do objeto jogo
+                                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n🏆 **${game.homeTeam} x ${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}\n${canal}`;
                                 }).join('\n\n');
 
                                 // Emoji específico por liga
@@ -1403,6 +1429,21 @@ class DiscordStreamBot {
                 hasAnyGames = true;
             }
 
+            // 5. CS2 ESPORTS IMPORTANTES - NOVO
+            const cs2Games = await this.sportsIntegration.getCS2MatchesToday();
+            if (cs2Games.length > 0) {
+                const cs2Text = cs2Games.slice(0, 3).map(game => {
+                    let stars = '';
+                    if (game.stars >= 3) stars = '⭐⭐⭐';
+                    else if (game.stars >= 2) stars = '⭐⭐';
+                    else if (game.stars >= 1) stars = '⭐';
+                    
+                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n${stars} **${game.homeTeam} x ${game.awayTeam}**\n🏆 ${game.league}`;
+                }).join('\n\n');
+                embed.fields.push({ name: '🎮 CS2 ESPORTS', value: cs2Text, inline: false });
+                hasAnyGames = true;
+            }
+
             if (!hasAnyGames) {
                 embed.fields.push({
                     name: '😴 Dia tranquilo',
@@ -1713,9 +1754,10 @@ class DiscordStreamBot {
                         .setTimestamp()
                         .setFooter({ text: `TheSportsDB Premium - Brasileirão Real` });
 
-                    const jogosText = chunk.map(jogo => 
-                        `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`
-                    ).join('\n\n');
+                    const jogosText = chunk.map(jogo => {
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`;
+                    }).join('\n\n');
                     
                     embed.addFields({
                         name: `⚽ ${chunk.length} Jogos do Brasileirão`,
@@ -1743,14 +1785,8 @@ class DiscordStreamBot {
                         .setFooter({ text: `TheSportsDB Premium - Dados Reais` });
 
                     const jogosText = chunk.map(jogo => {
-                        // Determinar canal baseado na liga
-                        let canal = '📺 ESPN';
-                        if (jogo.league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
-                        else if (jogo.league.includes('Premier')) canal = '📺 **ESPN, Star+**';
-                        else if (jogo.league.includes('Libertadores')) canal = '📺 **Paramount+**';
-                        else if (jogo.league.includes('La Liga')) canal = '📺 **ESPN**';
-                        
-                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
+                        // Usar a data real do objeto jogo
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
                     }).join('\n\n');
                     
                     embed.addFields({
@@ -1789,7 +1825,7 @@ class DiscordStreamBot {
 
                         const nbaText = chunk.map(jogo => {
                             const canal = jogo.league.includes('WNBA') ? '📺 **ESPN, Amazon Prime**' : '📺 **ESPN, NBA League Pass**';
-                            return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n${canal}`;
+                            return `⏰ **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n${canal}`;
                         }).join('\n\n');
                         
                         embed.addFields({
@@ -1818,7 +1854,7 @@ class DiscordStreamBot {
                             let canal = '📺 ESPN';
                             if (jogo.league.includes('EuroLeague')) canal = '📺 **ESPN**';
                             
-                            return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
+                            return `⏰ **${jogo.date} às ${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
                         }).join('\n\n');
                         
                         embed.addFields({
@@ -1832,6 +1868,47 @@ class DiscordStreamBot {
                 }
             }
 
+            // ========== EMBED 4: CS2 ESPORTS ==========
+            if (sportsData.cs2 && sportsData.cs2.length > 0) {
+                totalImportantGames += sportsData.cs2.length;
+                
+                // Dividir jogos de CS2 em chunks de 6 jogos por mensagem
+                const cs2Chunks = this.splitGamesIntoMessages(sportsData.cs2, 6);
+                
+                cs2Chunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🎮 CS2 ESPORTS ${cs2Chunks.length > 1 ? `(${index + 1}/${cs2Chunks.length})` : ''}`)
+                        .setDescription('🏆 Principais campeonatos de Counter-Strike 2')
+                        .setColor(0xFFA500) // Laranja CS2
+                        .setTimestamp()
+                        .setFooter({ text: `HLTV API - Jogos Importantes` });
+
+                    const jogosText = chunk.map(jogo => {
+                        // Emoji baseado na importância (stars)
+                        let emoji = '🎮';
+                        if (jogo.stars >= 3) emoji = '⭐⭐⭐';
+                        else if (jogo.stars >= 2) emoji = '⭐⭐';
+                        else if (jogo.stars >= 1) emoji = '⭐';
+                        
+                        // Canal baseado no evento
+                        let canal = '📺 **Twitch, YouTube**';
+                        if (jogo.league.toLowerCase().includes('blast')) canal = '📺 **Twitch/BLAST**';
+                        else if (jogo.league.toLowerCase().includes('esl')) canal = '📺 **Twitch/ESL**';
+                        else if (jogo.league.toLowerCase().includes('major')) canal = '📺 **Twitch/PGL**';
+                        
+                        return `📅 **${jogo.date} às ${jogo.time}** - ${jogo.status}\n${emoji} **${jogo.homeTeam} x ${jogo.awayTeam}**\n🏆 ${jogo.league}\n🗺️ ${jogo.format}\n${canal}`;
+                    }).join('\n\n');
+                    
+                    embed.addFields({
+                        name: `🎮 ${chunk.length} Jogos de CS2`,
+                        value: jogosText,
+                        inline: false
+                    });
+
+                    embeds.push(embed);
+                });
+            }
+
             // ========== EMBED FINAL: RESUMO ==========
             if (embeds.length > 0) {
                 const summaryEmbed = new EmbedBuilder()
@@ -1843,7 +1920,7 @@ class DiscordStreamBot {
 
                 summaryEmbed.addFields({
                     name: '📊 Total de Jogos Encontrados',
-                    value: `✅ **${totalImportantGames}** jogos importantes\n🇧🇷 Brasileirão: ${sportsData.footballBrazil?.length || 0}\n⚽ Internacional: ${sportsData.footballInternational?.length || 0}\n🏀 Basquete: ${sportsData.nba?.length || 0}`,
+                    value: `✅ **${totalImportantGames}** jogos importantes\n🇧🇷 Brasileirão: ${sportsData.footballBrazil?.length || 0}\n⚽ Internacional: ${sportsData.footballInternational?.length || 0}\n🏀 Basquete: ${sportsData.nba?.length || 0}\n🎮 CS2: ${sportsData.cs2?.length || 0}`,
                     inline: true
                 });
 
@@ -1952,6 +2029,154 @@ class DiscordStreamBot {
         } catch (error) {
             console.error('❌ Erro no comando searchteam:', error);
             await loadingMsg.edit('❌ Erro ao buscar time. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !scs2 - JOGOS DE CS2 ESPORTS
+    async commandCS2(message) {
+        console.log('🎮 Executando comando !scs2 - CS2 ESPORTS');
+        
+        const loadingMsg = await message.reply('🎮 Buscando jogos de CS2 via HLTV API...');
+        
+        try {
+            const cs2Games = await this.sportsIntegration.getCS2MatchesToday();
+            
+            if (!cs2Games || cs2Games.length === 0) {
+                const embed = new EmbedBuilder()
+                    .setTitle('⚠️ NENHUM JOGO DE CS2 HOJE')
+                    .setDescription('📡 Não há jogos importantes de Counter-Strike 2 agendados')
+                    .setColor(0x808080)
+                    .setTimestamp()
+                    .setFooter({ text: `HLTV API - Nenhum evento importante` })
+                    .addFields({
+                        name: '💡 Sugestões',
+                        value: '`!sproximos` - Ver todos os esportes\n`!saovivo` - Streamers de CS2 online\n`!shoje` - Outros esportes hoje',
+                        inline: false
+                    });
+
+                return await loadingMsg.edit({ content: '', embeds: [embed] });
+            }
+
+            const embeds = [];
+
+            // Separar por importância (stars)
+            const topTierMatches = cs2Games.filter(game => game.stars >= 3);
+            const highTierMatches = cs2Games.filter(game => game.stars === 2);
+            const mediumTierMatches = cs2Games.filter(game => game.stars === 1);
+            const otherMatches = cs2Games.filter(game => game.stars === 0);
+
+            // ========== TOP TIER (3+ STARS) ==========
+            if (topTierMatches.length > 0) {
+                const embed = new EmbedBuilder()
+                    .setTitle('⭐⭐⭐ CS2 TOP TIER MATCHES')
+                    .setDescription('🏆 Jogos mais importantes do Counter-Strike 2')
+                    .setColor(0xFFD700) // Dourado
+                    .setTimestamp()
+                    .setFooter({ text: `HLTV API - ${topTierMatches.length} matches TOP TIER` });
+
+                const gamesText = topTierMatches.map(game => {
+                    let canal = '📺 **Twitch/YouTube**';
+                    if (game.league.toLowerCase().includes('blast')) canal = '📺 **Twitch/BLAST**';
+                    else if (game.league.toLowerCase().includes('esl')) canal = '📺 **Twitch/ESL**';
+                    else if (game.league.toLowerCase().includes('major')) canal = '📺 **Twitch/PGL**';
+                    
+                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n⭐⭐⭐ **${game.homeTeam} x ${game.awayTeam}**\n🏆 ${game.league}\n🗺️ ${game.format}\n${canal}`;
+                }).join('\n\n');
+
+                embed.addFields({
+                    name: `🏆 ${topTierMatches.length} Jogos Top Tier`,
+                    value: gamesText,
+                    inline: false
+                });
+
+                embeds.push(embed);
+            }
+
+            // ========== HIGH TIER (2 STARS) ==========
+            if (highTierMatches.length > 0) {
+                const embed = new EmbedBuilder()
+                    .setTitle('⭐⭐ CS2 HIGH TIER MATCHES')
+                    .setDescription('🥈 Jogos importantes do Counter-Strike 2')
+                    .setColor(0xC0C0C0) // Prata
+                    .setTimestamp()
+                    .setFooter({ text: `HLTV API - ${highTierMatches.length} matches HIGH TIER` });
+
+                const gamesText = highTierMatches.map(game => {
+                    let canal = '📺 **Twitch/YouTube**';
+                    if (game.league.toLowerCase().includes('blast')) canal = '📺 **Twitch/BLAST**';
+                    else if (game.league.toLowerCase().includes('esl')) canal = '📺 **Twitch/ESL**';
+                    
+                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n⭐⭐ **${game.homeTeam} x ${game.awayTeam}**\n🏆 ${game.league}\n🗺️ ${game.format}\n${canal}`;
+                }).join('\n\n');
+
+                embed.addFields({
+                    name: `🥈 ${highTierMatches.length} Jogos High Tier`,
+                    value: gamesText,
+                    inline: false
+                });
+
+                embeds.push(embed);
+            }
+
+            // ========== MEDIUM TIER (1 STAR) ==========
+            if (mediumTierMatches.length > 0) {
+                const embed = new EmbedBuilder()
+                    .setTitle('⭐ CS2 MEDIUM TIER MATCHES')
+                    .setDescription('🥉 Outros jogos relevantes do Counter-Strike 2')
+                    .setColor(0xCD7F32) // Bronze
+                    .setTimestamp()
+                    .setFooter({ text: `HLTV API - ${mediumTierMatches.length} matches MEDIUM TIER` });
+
+                const gamesText = mediumTierMatches.slice(0, 10).map(game => {
+                    return `📅 **${game.date} às ${game.time}** - ${game.status}\n⭐ **${game.homeTeam} x ${game.awayTeam}**\n🏆 ${game.league}\n🗺️ ${game.format}`;
+                }).join('\n\n');
+
+                embed.addFields({
+                    name: `🥉 ${Math.min(mediumTierMatches.length, 10)} Jogos Medium Tier`,
+                    value: gamesText + (mediumTierMatches.length > 10 ? `\n\n💡 **+${mediumTierMatches.length - 10} outros jogos**` : ''),
+                    inline: false
+                });
+
+                embeds.push(embed);
+            }
+
+            // ========== RESUMO FINAL ==========
+            const totalMatches = cs2Games.length;
+            const summaryEmbed = new EmbedBuilder()
+                .setTitle('🎮 RESUMO CS2 ESPORTS')
+                .setDescription('📊 Todos os jogos importantes de Counter-Strike 2!')
+                .setColor(0xFFA500) // Laranja CS2
+                .setTimestamp()
+                .setFooter({ text: `HLTV API - ${embeds.length + 1} mensagens enviadas` });
+
+            summaryEmbed.addFields({
+                name: '📊 Total de Jogos CS2',
+                value: `⭐⭐⭐ **Top Tier:** ${topTierMatches.length} jogos\n⭐⭐ **High Tier:** ${highTierMatches.length} jogos\n⭐ **Medium Tier:** ${mediumTierMatches.length} jogos\n🎮 **Total:** ${totalMatches} jogos`,
+                inline: true
+            });
+
+            summaryEmbed.addFields({
+                name: '🎯 Qualidade dos Dados',
+                value: '✅ **HLTV API** - Fonte oficial\n⭐ **Sistema de ranking** por importância\n🏆 **Eventos principais** destacados\n📅 **Dados em tempo real**',
+                inline: true
+            });
+
+            summaryEmbed.addFields({
+                name: '💡 Comandos Relacionados',
+                value: '`!saovivo` - Streamers CS2 online\n`!sproximos` - Todos os esportes\n`!shoje` - Resumo esportes hoje',
+                inline: false
+            });
+
+            embeds.push(summaryEmbed);
+
+            // Enviar todas as mensagens
+            await loadingMsg.delete();
+            await this.sendMultipleEmbeds(message, embeds, 1200);
+            console.log(`✅ Comando !scs2: ${embeds.length} mensagens enviadas com ${totalMatches} jogos!`);
+
+        } catch (error) {
+            console.error('❌ Erro no comando CS2:', error);
+            await loadingMsg.edit('❌ Erro ao buscar jogos de CS2. Tente novamente.');
         }
     }
 
