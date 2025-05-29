@@ -97,24 +97,94 @@ class SportsIntegration {
 
     async getUpcomingMatches(sport, leagueId, limit = 10) {
         try {
-            console.log(`📅 Buscando próximos ${limit} jogos de ${sport}...`);
+            console.log(`📅 Buscando próximos ${limit} jogos de ${sport} (Liga ID: ${leagueId})...`);
             
-            const url = `https://www.thesportsdb.com/api/v2/json/schedule/next/league/${leagueId}`;
-            
-            const response = await fetch(url, {
-                headers: {
-                    'X-API-KEY': this.premiumApiKey
-                }
+            // Tentar V2 API primeiro
+            let url = `https://www.thesportsdb.com/api/v2/json/schedule/next/league/${leagueId}`;
+            let response = await fetch(url, {
+                headers: { 'X-API-KEY': this.premiumApiKey }
             });
 
-            if (!response.ok) {
-                console.log(`❌ Erro ao buscar próximos jogos: ${response.status}`);
-                return [];
+            if (response.ok) {
+                const data = await response.json();
+                if (data.events && data.events.length > 0) {
+                    console.log(`✅ V2 API: ${data.events.length} próximos jogos encontrados`);
+                    return this.processV2ScheduleData(data, sport);
+                }
             }
 
-            const data = await response.json();
-            console.log(`✅ Próximos jogos de ${sport} obtidos!`);
-            return this.processV2ScheduleData(data, sport);
+            // Fallback: V1 API próximos jogos da liga
+            console.log(`🔄 Tentando V1 API próximos jogos da liga...`);
+            url = `https://www.thesportsdb.com/api/v1/json/${this.premiumApiKey}/eventsnext.php?id=${leagueId}`;
+            response = await fetch(url);
+
+            if (response.ok) {
+                const text = await response.text();
+                try {
+                    const data = JSON.parse(text);
+                    if (data.events && data.events.length > 0) {
+                        console.log(`✅ V1 Liga API: ${data.events.length} próximos jogos encontrados`);
+                        return this.processV1Data(data, sport);
+                    }
+                } catch (jsonError) {
+                    console.log(`⚠️ V1 API retornou resposta inválida para liga ${leagueId}`);
+                }
+            }
+
+            // Fallback: Buscar próximos jogos de teams específicos brasileiros
+            if (sport === 'football' && leagueId === '4351') {
+                console.log(`🇧🇷 Buscando próximos jogos de times brasileiros principais...`);
+                const brazilianTeams = [
+                    { name: 'Flamengo', id: '133609' },
+                    { name: 'Palmeiras', id: '133613' },
+                    { name: 'Corinthians', id: '133604' },
+                    { name: 'São Paulo', id: '133618' },
+                    { name: 'Santos', id: '133614' },
+                    { name: 'Grêmio', id: '133620' },
+                    { name: 'Internacional', id: '133622' },
+                    { name: 'Fluminense', id: '133612' }
+                ];
+
+                const allGames = [];
+                for (const team of brazilianTeams.slice(0, 3)) { // Só 3 times para não sobrecarregar
+                    try {
+                        const teamUrl = `https://www.thesportsdb.com/api/v1/json/${this.premiumApiKey}/eventsnext.php?id=${team.id}`;
+                        const teamResponse = await fetch(teamUrl);
+                        
+                        if (teamResponse.ok) {
+                            const teamData = await teamResponse.json();
+                            if (teamData.events) {
+                                // Filtrar só jogos do Brasileirão
+                                const brasileiraoGames = teamData.events.filter(game => 
+                                    game.strLeague && (
+                                        game.strLeague.includes('Brazil') ||
+                                        game.strLeague.includes('Serie A') ||
+                                        game.strLeague.includes('Brasileirão') ||
+                                        game.strLeague.includes('Brazilian')
+                                    )
+                                );
+                                allGames.push(...brasileiraoGames);
+                                console.log(`📊 ${team.name}: ${brasileiraoGames.length} jogos do Brasileirão`);
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`⚠️ Erro ao buscar ${team.name}:`, error.message);
+                    }
+                }
+
+                if (allGames.length > 0) {
+                    console.log(`✅ Total encontrado: ${allGames.length} próximos jogos do Brasileirão`);
+                    // Remover duplicatas e ordenar por data
+                    const uniqueGames = allGames.filter((game, index, self) => 
+                        index === self.findIndex(g => g.idEvent === game.idEvent)
+                    ).sort((a, b) => new Date(a.dateEvent) - new Date(b.dateEvent));
+                    
+                    return this.processV1Data({ events: uniqueGames.slice(0, limit) }, sport);
+                }
+            }
+
+            console.log(`⚠️ Nenhum próximo jogo encontrado para ${sport} (Liga ${leagueId})`);
+            return [];
 
         } catch (error) {
             console.error(`❌ Erro ao buscar próximos jogos ${sport}:`, error.message);
