@@ -202,69 +202,65 @@ class DiscordStreamBot {
 
     // Mostrar configuração atual
     showCurrentConfig() {
-        console.log('\n📋 CONFIGURAÇÃO ATUAL:');
+        console.log('\n📋 CONFIGURAÇÃO ATUAL - THESPORTSDB PREMIUM:');
         console.log(`📺 Canal alvo: #${this.config.target_channel}`);
         console.log('🎮 CS2 Brasil:', this.config.streamers.cs2_br.join(', '));
         console.log('🏆 CS2 International:', this.config.streamers.cs2_international.join(', '));
         console.log('⚽ Futebol:', this.config.streamers.futebol.join(', '));
         console.log('📺 Variety:', this.config.streamers.variety.join(', '));
         
-        console.log('\n🏆 CAMPEONATOS DE FUTEBOL:');
-        console.log('🇧🇷 Nacionais:', this.config.football_championships.nacionais.join(', '));
-        console.log('🌍 Internacionais:', this.config.football_championships.internacionais.join(', '));
-        console.log('🏆 Copas:', this.config.football_championships.copas.join(', '));
+        console.log('\n🏆 ESPORTES MONITORADOS (THESPORTSDB PREMIUM):');
+        console.log('⚽ Futebol: Brasileirão Série A, Premier League, La Liga, Serie A, Champions League');
+        console.log('🏀 Basquete: NBA (todos os jogos), NBB brasileiro');
+        console.log('🎾 Tênis: Só brasileiros (João Fonseca, Bia Haddad Maia, etc.)');
+        console.log('🏐 Volleyball: FIVB, ligas internacionais');
         
-        console.log('\n🏅 OUTROS ESPORTES (API-SPORTS.IO):');
-        console.log('🏀 Basquete: NBA, Euroleague, NBB');
-        console.log('🎾 Tênis: ATP, WTA, Grand Slams');
-        console.log('🏐 Volleyball: FIVB, Superliga BR');
-        console.log('🏒 Hockey: NHL');
-        console.log('⚾ Baseball: MLB');
-        console.log('🏈 Football Americano: NFL');
+        console.log('\n💎 API PREMIUM ATIVA:');
+        console.log('✅ TheSportsDB Premium - API Key: 959508');
+        console.log('📊 Rate Limit: 100 requests/minuto');
+        console.log('📅 Dados: 2025 reais + livescores em tempo real');
+        console.log('💰 Custo: €9/mês (muito mais barato que alternativas)');
         
-        console.log('\n🔑 APIS CONFIGURADAS:');
-        console.log('⚽ API Futebol:', this.config.apis.api_futebol_token ? '✅ Configurada' : '❌ Não configurada');
-        console.log('🏀 API Sports:', this.config.apis.api_sports_token ? '✅ Configurada' : '❌ Não configurada');
+        console.log('\n🎯 FILTROS APLICADOS:');
+        console.log('✅ Só principais campeonatos (sem série B/C)');
+        console.log('✅ Brasileiros priorizados em tênis');
+        console.log('✅ NBA: todos os jogos mostrados');
+        console.log('❌ Divisões inferiores excluídas');
         console.log('');
     }
 
     // Mostrar comandos disponíveis
     showAvailableCommands() {
-        console.log('🤖 COMANDOS DISPONÍVEIS:');
-        console.log('📺 STREAMS:');
+        console.log('🤖 COMANDOS DISPONÍVEIS - THESPORTSDB PREMIUM:');
+        console.log('📺 STREAMS & TWITCH:');
         console.log('!saovivo - Verificar streamers online');
         console.log('');
-        console.log('⚽ FUTEBOL BRASILEIRO:');
-        console.log('!shoje - Jogos de hoje');
-        console.log('!samanha - Jogos de amanhã');
-        console.log('!ssemana - Jogos da semana');
+        console.log('🔴 LIVESCORES (TEMPO REAL):');
+        console.log('!slivescores ou !slive - Todos os jogos ao vivo');
+        console.log('!slivefutebol - Só futebol ao vivo');
+        console.log('!slivebasket - Só basquete ao vivo');
         console.log('');
-        console.log('🏀 BASQUETE:');
-        console.log('!snba - Jogos da NBA');
-        console.log('!snbb - Basquete brasileiro');
+        console.log('📅 AGENDA & PRÓXIMOS JOGOS:');
+        console.log('!sproximos ou !sagenda - Próximos jogos principais');
+        console.log('!ssemana - Agenda completa da semana');
         console.log('');
-        console.log('🎾 TÊNIS:');
-        console.log('!stenis - Torneios de tênis');
-        console.log('!satp - Ranking ATP');
-        console.log('!swta - Ranking WTA');
+        console.log('⚽ FUTEBOL & ESPORTES HOJE:');
+        console.log('!shoje - Todos os esportes de hoje (filtro brasileiro)');
+        console.log('!sfutebol - Só futebol principais campeonatos');
         console.log('');
-        console.log('🏐 VOLLEYBALL:');
-        console.log('!svolley - Jogos de volleyball');
-        console.log('');
-        console.log('🏒 HOCKEY:');
-        console.log('!snhl - Jogos da NHL');
-        console.log('');
-        console.log('⚾ BASEBALL:');
-        console.log('!smlb - Jogos da MLB');
-        console.log('');
-        console.log('🏈 FOOTBALL AMERICANO:');
-        console.log('!snfl - Jogos da NFL');
+        console.log('🔍 BUSCA DE TIMES:');
+        console.log('!stime [nome] - Buscar informações de time');
+        console.log('  Exemplos: !stime Arsenal, !stime Flamengo');
         console.log('');
         console.log('⚙️ SISTEMA:');
-        console.log('!sconfig - Configurações do bot');
-        console.log('!shelp - Lista de comandos');
         console.log('!sping - Testar bot');
         console.log('!sstats - Estatísticas');
+        console.log('!sconfig - Configurações do bot');
+        console.log('!shelp - Lista de comandos');
+        console.log('');
+        console.log('💎 STATUS: TheSportsDB Premium Ativo (€9/mês)');
+        console.log('📊 DADOS: 2025 reais + livescores em tempo real');
+        console.log('🎯 FILTROS: Brasileiros priorizados, só principais campeonatos');
         console.log('');
     }
 
@@ -286,54 +282,32 @@ class DiscordStreamBot {
         try {
             switch (command) {
                 case '!saovivo':
-                    return await this.commandAoVivo(message);
+                    return await this.commandStreamersOnline(message);
                 case '!shoje':
                     return await this.commandHoje(message);
-                case '!samanha':
-                    return await this.commandAmanha(message);
+                case '!sfutebol':
+                    return await this.commandFutebol(message);
+                
+                // Novos comandos premium TheSportsDB
+                case '!slivescores':
+                case '!slive':
+                    return await this.commandLivescores(message);
+                case '!slivefutebol':
+                    return await this.commandLiveFutebol(message);
+                case '!slivebasket':
+                    return await this.commandLiveBasket(message);
+                case '!sproximos':
+                case '!sagenda':
+                    return await this.commandProximos(message);
                 case '!ssemana':
                     return await this.commandSemana(message);
                 
-                // Basquete
-                case '!snba':
-                    return await this.sportsIntegration.commandNBA(message);
-                case '!snbb':
-                    return await this.sportsIntegration.commandNBB(message);
-                
-                // Tênis
-                case '!stenis':
-                    return await this.sportsIntegration.commandTenis(message);
-                case '!satp':
-                    return await this.sportsIntegration.commandATP(message);
-                case '!swta':
-                    return await this.sportsIntegration.commandWTA(message);
-                
-                // Volleyball
-                case '!svolley':
-                    return await this.sportsIntegration.commandVolleyball(message);
-                
-                // Hockey
-                case '!snhl':
-                    return await this.sportsIntegration.commandNHL(message);
-                
-                // Baseball
-                case '!smlb':
-                    return await this.sportsIntegration.commandMLB(message);
-                
-                // Football Americano
-                case '!snfl':
-                    return await this.sportsIntegration.commandNFL(message);
-                    
-                // Sistema
-                case '!sconfig':
-                    return await this.commandConfig(message);
-                case '!shelp':
-                    return await this.commandHelp(message);
-                case '!sping':
-                    return await this.commandPing(message);
-                case '!sstats':
-                    return await this.commandStats(message);
+                // Comando especial para busca de times
                 default:
+                    if (command.startsWith('!stime ')) {
+                        const teamName = command.substring(7).trim(); // Remove "!stime "
+                        return await this.commandSearchTeam(message, teamName);
+                    }
                     return null; // Comando não reconhecido
             }
         } catch (error) {
@@ -360,7 +334,7 @@ class DiscordStreamBot {
 
     // ========== COMANDOS ==========
 
-    async commandAoVivo(message) {
+    async commandStreamersOnline(message) {
         console.log('🔍 Executando comando !saovivo');
         
         const loadingMsg = await message.reply('🔍 Verificando streamers online...');
@@ -438,58 +412,149 @@ class DiscordStreamBot {
     }
 
     async commandHoje(message) {
-        console.log('📅 Executando comando !shoje');
+        console.log('📅 Executando comando !shoje - TODOS OS ESPORTES DE HOJE');
         
-        const today = new Date();
-        const todayStr = today.toLocaleDateString('pt-BR');
+        const loadingMsg = await message.reply('🔍 Buscando TODOS os jogos de hoje...');
+        
+        try {
+            const today = new Date().toLocaleDateString('pt-BR');
+            
+            const embed = new EmbedBuilder()
+                .setTitle('🌟 TODOS OS JOGOS DE HOJE')
+                .setDescription(`📅 ${today} - Esportes com brasileiros ou relevantes`)
+                .setColor(0x00ff00)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Dados reais via TheSportsDB Premium` });
 
-        const embed = new EmbedBuilder()
-            .setTitle('⚽ JOGOS DE HOJE')
-            .setDescription(`Jogos programados para ${todayStr}`)
-            .setColor(0x00ff00)
-            .setTimestamp()
-            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
+            let hasAnyGames = false;
 
-        const fields = this.generateMockMatches('hoje');
-        embed.addFields(fields);
+            // 1. FUTEBOL BRASILEIRO (sempre mostrar Brasileirão) - ATUALIZADO
+            const brasileiraoGames = await this.sportsIntegration.getBrazilianFootballToday();
+            if (brasileiraoGames.length > 0) {
+                const gamesList = brasileiraoGames.slice(0, 3).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.addFields({ name: '🇧🇷 BRASILEIRÃO SÉRIE A', value: gamesList, inline: false });
+                hasAnyGames = true;
+            }
 
-        await message.reply({ embeds: [embed] });
+            // 2. NBA (mostrar TODOS os jogos) - ATUALIZADO
+            const nbaGames = await this.sportsIntegration.getNBAToday();
+            if (nbaGames.length > 0) {
+                const gamesList = nbaGames.slice(0, 4).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.addFields({ name: '🏀 NBA - TODOS OS JOGOS', value: gamesList, inline: false });
+                hasAnyGames = true;
+            }
+
+            // 3. TÊNIS (só com brasileiros: Bia Haddad Maia, João Fonseca, etc.) - ATUALIZADO
+            const tennisGames = await this.sportsIntegration.getBrazilianTennisToday();
+            if (tennisGames.length > 0) {
+                const tennisText = tennisGames.slice(0, 2).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.addFields({ name: '🎾 TÊNIS BRASILEIRO', value: tennisText, inline: false });
+                hasAnyGames = true;
+            }
+
+            // 4. PRINCIPAIS CAMPEONATOS INTERNACIONAIS - ATUALIZADO
+            const mainFootballGames = await this.sportsIntegration.getMainFootballChampionshipsToday();
+            if (mainFootballGames.length > 0) {
+                // Agrupar por liga e mostrar só os mais importantes
+                const importantLeagues = mainFootballGames.filter(game => 
+                    game.league.includes('Premier') || 
+                    game.league.includes('Champions') || 
+                    game.league.includes('La Liga') ||
+                    game.league.includes('Serie A')
+                );
+                
+                if (importantLeagues.length > 0) {
+                    const gamesText = importantLeagues.slice(0, 3).map(game => 
+                        `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}** (${game.league})`
+                    ).join('\n');
+                    embed.addFields({ name: '🏆 PRINCIPAIS CAMPEONATOS', value: gamesText, inline: false });
+                    hasAnyGames = true;
+                }
+            }
+
+            if (!hasAnyGames) {
+                embed.addFields({ 
+                    name: '😴 Dia calmo', 
+                    value: 'Não há jogos relevantes ou com brasileiros hoje.\n\n💡 Use `!sfutebol`, `!slivescores` para ver mais esportes.',
+                    inline: false 
+                });
+            } else {
+                embed.addFields({ 
+                    name: '💡 Comandos Específicos', 
+                    value: '`!sfutebol` - Todos os campeonatos de futebol\n`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos jogos',
+                    inline: false 
+                });
+            }
+
+            await loadingMsg.edit({ content: null, embeds: [embed] });
+        } catch (error) {
+            console.error('❌ Erro comando hoje:', error.message);
+            await loadingMsg.edit({ content: '❌ Erro ao buscar jogos. Tente novamente.' });
+        }
     }
 
     async commandAmanha(message) {
         console.log('📅 Executando comando !samanha');
         
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowStr = tomorrow.toLocaleDateString('pt-BR');
+        const loadingMsg = await message.reply('⚽ Buscando jogos de amanhã...');
+        
+        try {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toLocaleDateString('pt-BR');
 
-        const embed = new EmbedBuilder()
-            .setTitle('⚽ JOGOS DE AMANHÃ')
-            .setDescription(`Jogos programados para ${tomorrowStr}`)
-            .setColor(0x0099ff)
-            .setTimestamp()
-            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
+            const embed = new EmbedBuilder()
+                .setTitle('⚽ JOGOS DE AMANHÃ')
+                .setDescription(`Jogos programados para ${tomorrowStr}`)
+                .setColor(0x0099ff)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
 
-        const fields = this.generateMockMatches('amanha');
-        embed.addFields(fields);
+            // Buscar jogos reais do futebol via API-Sports (com data de amanhã)
+            embed.addFields({ 
+                name: '📅 Jogos de Amanhã', 
+                value: 'Funcionalidade em desenvolvimento.\n\n✅ Use `!shoje` para jogos de hoje com dados reais.',
+                inline: false 
+            });
 
-        await message.reply({ embeds: [embed] });
+            await loadingMsg.edit({ content: null, embeds: [embed] });
+        } catch (error) {
+            console.error('❌ Erro comando amanhã:', error.message);
+            await loadingMsg.edit({ content: '❌ Erro ao buscar jogos de amanhã. Tente novamente.' });
+        }
     }
 
     async commandSemana(message) {
         console.log('📅 Executando comando !ssemana');
         
-        const embed = new EmbedBuilder()
-            .setTitle('📅 JOGOS DA SEMANA')
-            .setDescription('Principais jogos dos próximos 7 dias')
-            .setColor(0x9900ff)
-            .setTimestamp()
-            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
+        const loadingMsg = await message.reply('⚽ Buscando jogos da semana...');
+        
+        try {
+            const embed = new EmbedBuilder()
+                .setTitle('📅 JOGOS DA SEMANA')
+                .setDescription('Principais jogos dos próximos 7 dias')
+                .setColor(0x9900ff)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` });
 
-        const fields = this.generateMockMatches('semana');
-        embed.addFields(fields);
+            // Buscar jogos reais do futebol via API-Sports (próximos 7 dias)
+            embed.addFields({ 
+                name: '📅 Jogos da Semana', 
+                value: 'Funcionalidade em desenvolvimento.\n\n✅ Use `!shoje` para jogos de hoje com dados reais.',
+                inline: false 
+            });
 
-        await message.reply({ embeds: [embed] });
+            await loadingMsg.edit({ content: null, embeds: [embed] });
+        } catch (error) {
+            console.error('❌ Erro comando semana:', error.message);
+            await loadingMsg.edit({ content: '❌ Erro ao buscar jogos da semana. Tente novamente.' });
+        }
     }
 
     async commandConfig(message) {
@@ -520,19 +585,57 @@ class DiscordStreamBot {
         console.log('❓ Executando comando !shelp');
         
         const embed = new EmbedBuilder()
-            .setTitle('🤖 COMANDOS DISPONÍVEIS')
-            .setDescription('Lista completa de comandos do Smart Stream Bot')
+            .setTitle('🤖 COMANDOS DISPONÍVEIS - TheSportsDB Premium')
+            .setDescription('Lista completa de comandos do Smart Stream Bot com dados reais 2025!')
             .setColor(0x7289da)
             .setTimestamp()
-            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` })
+            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel} | ✅ TheSportsDB Premium Ativo` })
             .addFields(
-                { name: '📺 Streams', value: '`!saovivo` - Ver streamers online agora', inline: false },
-                { name: '⚽ Futebol Brasileiro', value: '`!shoje` - Jogos de hoje\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana', inline: false },
-                { name: '🏀 Basquete', value: '`!snba` - Jogos da NBA\n`!snbb` - Basquete brasileiro', inline: false },
-                { name: '🎾 Tênis', value: '`!stenis` - Torneios ativos\n`!satp` - Ranking ATP\n`!swta` - Ranking WTA', inline: false },
-                { name: '🏐🏒⚾🏈 Outros', value: '`!svolley` - Volleyball\n`!snhl` - Hockey NHL\n`!smlb` - Baseball MLB\n`!snfl` - Football NFL', inline: false },
-                { name: '⚙️ Sistema', value: '`!sconfig` - Configurações do bot\n`!sstats` - Estatísticas\n`!sping` - Testar bot', inline: false },
-                { name: '💡 Dica', value: 'Configure API_SPORTS_TOKEN no Railway para dados reais dos esportes!', inline: false }
+                { 
+                    name: '📺 STREAMS & TWITCH', 
+                    value: '`!saovivo` - Ver streamers online agora', 
+                    inline: false 
+                },
+                { 
+                    name: '🔴 LIVESCORES (TEMPO REAL)', 
+                    value: '`!slivescores` ou `!slive` - 🌟 **Todos os jogos ao vivo**\n`!slivefutebol` - ⚽ Só futebol ao vivo\n`!slivebasket` - 🏀 Só basquete ao vivo', 
+                    inline: false 
+                },
+                { 
+                    name: '📅 AGENDA & PRÓXIMOS JOGOS', 
+                    value: '`!sproximos` ou `!sagenda` - 📋 Próximos jogos principais\n`!ssemana` - 🗓️ Agenda completa da semana', 
+                    inline: false 
+                },
+                { 
+                    name: '⚽ FUTEBOL & ESPORTES HOJE', 
+                    value: '`!shoje` - 🌟 **Todos os esportes de hoje** (filtro brasileiro)\n`!sfutebol` - ⚽ **Só futebol** principais campeonatos', 
+                    inline: false 
+                },
+                { 
+                    name: '🔍 BUSCA DE TIMES', 
+                    value: '`!stime [nome]` - 🔎 Buscar informações de time\n📝 **Exemplos**: `!stime Arsenal`, `!stime Flamengo`, `!stime Lakers`', 
+                    inline: false 
+                },
+                { 
+                    name: '⚙️ SISTEMA & STATUS', 
+                    value: '`!sping` - 🏓 Testar bot\n`!sstats` - 📊 Estatísticas\n`!sconfig` - ⚙️ Configurações', 
+                    inline: false 
+                },
+                { 
+                    name: '🎯 FILTROS APLICADOS', 
+                    value: '⚽ **Futebol**: Só principais (❌ série B/C excluídas)\n🏀 **NBA**: Todos os jogos mostrados\n🎾 **Tênis**: Só brasileiros (João Fonseca ✅)\n🏆 **Campeonatos**: Champions, Premier, La Liga, etc.', 
+                    inline: false 
+                },
+                { 
+                    name: '💎 STATUS PREMIUM ATIVO', 
+                    value: '✅ **TheSportsDB Premium** - API Key: 959508\n📊 **Rate Limit**: 100 requests/minuto\n📅 **Dados**: 2025 reais + livescores em tempo real\n💰 **Custo**: €9/mês (muito mais barato que alternativas)\n🚀 **Recursos**: Livescores, agenda, busca de times, highlights', 
+                    inline: false 
+                },
+                { 
+                    name: '🌟 COMANDOS MAIS USADOS', 
+                    value: '**Dia a dia**: `!shoje`, `!slivescores`\n**Planejamento**: `!sproximos`, `!ssemana`\n**Pesquisa**: `!stime Arsenal`\n**Streams**: `!saovivo`', 
+                    inline: false 
+                }
             );
 
         await message.reply({ embeds: [embed] });
@@ -580,6 +683,178 @@ class DiscordStreamBot {
             );
 
         await message.reply({ embeds: [embed] });
+    }
+
+    // NOVO COMANDO: !sfutebol - SÓ FUTEBOL COMPLETO - ATUALIZADO PARA THESPORTSDB
+    async commandFutebol(message) {
+        console.log('⚽ Executando comando !sfutebol - SÓ FUTEBOL PRINCIPAL');
+        
+        const loadingMsg = await message.reply('⚽ Buscando todos os principais campeonatos de futebol...');
+        
+        try {
+            const today = new Date().toLocaleDateString('pt-BR');
+            
+            const embed = new EmbedBuilder()
+                .setTitle('⚽ FUTEBOL - PRINCIPAIS CAMPEONATOS')
+                .setDescription(`📅 ${today} - Só os principais campeonatos (sem série B/C)`)
+                .setColor(0x228b22)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - TheSportsDB Premium` });
+
+            let hasAnyGames = false;
+
+            // 1. BRASILEIRÃO SÉRIE A (sempre prioritário) - NOVO SISTEMA
+            const brasileiraoGames = await this.sportsIntegration.getBrazilianFootballToday();
+            if (brasileiraoGames.length > 0) {
+                const gamesList = brasileiraoGames.map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}\n📺 Globo, SporTV`
+                ).join('\n\n');
+                embed.addFields({ name: '🇧🇷 BRASILEIRÃO SÉRIE A', value: gamesList, inline: false });
+                hasAnyGames = true;
+            }
+
+            // 2. PRINCIPAIS CAMPEONATOS INTERNACIONAIS - NOVO SISTEMA  
+            const mainChampionships = await this.sportsIntegration.getMainFootballChampionshipsToday();
+            
+            if (mainChampionships.length > 0) {
+                // Organizar por liga
+                const leagueGroups = {};
+                mainChampionships.forEach(game => {
+                    if (!leagueGroups[game.league]) {
+                        leagueGroups[game.league] = [];
+                    }
+                    leagueGroups[game.league].push(game);
+                });
+
+                // Mostrar cada liga separadamente com filtros
+                for (const [leagueName, games] of Object.entries(leagueGroups)) {
+                    // Filtrar só ligas principais (sem série B/C)
+                    const isMainLeague = 
+                        leagueName.includes('Premier League') ||
+                        leagueName.includes('La Liga') ||
+                        leagueName.includes('Serie A') ||
+                        leagueName.includes('Bundesliga') ||
+                        leagueName.includes('Ligue 1') ||
+                        leagueName.includes('Champions') ||
+                        leagueName.includes('Europa League');
+
+                    if (isMainLeague && games.length > 0) {
+                        const gamesList = games.slice(0, 3).map(game => 
+                            `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}`
+                        ).join('\n\n');
+
+                        // Emoji específico por liga
+                        let emoji = '🏆';
+                        if (leagueName.includes('Premier')) emoji = '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
+                        else if (leagueName.includes('La Liga')) emoji = '🇪🇸';
+                        else if (leagueName.includes('Serie A')) emoji = '🇮🇹';
+                        else if (leagueName.includes('Bundesliga')) emoji = '🇩🇪';
+                        else if (leagueName.includes('Ligue')) emoji = '🇫🇷';
+                        else if (leagueName.includes('Champions')) emoji = '⭐';
+
+                        embed.addFields({ 
+                            name: `${emoji} ${leagueName.toUpperCase()}`, 
+                            value: gamesList, 
+                            inline: false 
+                        });
+                        hasAnyGames = true;
+                    }
+                }
+            }
+
+            if (!hasAnyGames) {
+                embed.addFields({ 
+                    name: '📅 Nenhum jogo hoje', 
+                    value: 'Não há jogos dos principais campeonatos hoje.\n\n✅ **Dados reais via TheSportsDB Premium**\n\n💡 **Filtros aplicados:**\n• ✅ Brasileirão Série A\n• ✅ Premier League, La Liga, Serie A\n• ✅ Champions League, Europa League\n• ✅ Bundesliga, Ligue 1\n\n• ❌ Série B, Série C\n• ❌ 2ª divisões\n• ❌ Campeonatos menores',
+                    inline: false 
+                });
+            } else {
+                embed.addFields({ 
+                    name: '🎯 FILTROS APLICADOS', 
+                    value: '✅ **SÓ PRINCIPAIS CAMPEONATOS:**\n• 🇧🇷 Brasileirão Série A\n• ⭐ Champions League\n• 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League\n• 🇪🇸 La Liga, 🇮🇹 Serie A\n• 🇩🇪 Bundesliga, 🇫🇷 Ligue 1\n\n❌ **EXCLUÍDOS:**\n• Série B, Série C, Série D\n• 2ª divisão inglesa, alemã, etc.\n• Campeonatos estaduais menores\n• Ligas de divisões inferiores',
+                    inline: false 
+                });
+            }
+
+            await loadingMsg.edit({ content: null, embeds: [embed] });
+        } catch (error) {
+            console.error('❌ Erro comando futebol:', error.message);
+            await loadingMsg.edit({ content: '❌ Erro ao buscar jogos de futebol. Tente novamente.' });
+        }
+    }
+
+    // MÉTODO AUXILIAR: Filtro tênis brasileiro
+    async getBrazilianTennisToday() {
+        try {
+            // Lista de tenistas brasileiros
+            const brazilianPlayers = [
+                'Bia Haddad Maia', 'Beatriz Haddad Maia', 'B. Haddad Maia',
+                'João Fonseca', 'J. Fonseca', 'Joao Fonseca',
+                'Thiago Monteiro', 'T. Monteiro',
+                'Laura Pigossi', 'L. Pigossi',
+                'Felipe Meligeni', 'F. Meligeni'
+            ];
+
+            // Aqui você faria a busca real na API de tênis
+            // Por enquanto, vou retornar exemplo quando há brasileiros
+            
+            const hasBrazilianMatch = Math.random() > 0.6; // 40% chance (simulação)
+            
+            if (hasBrazilianMatch) {
+                const randomPlayer = Math.random() > 0.5 ? 'Bia Haddad Maia' : 'João Fonseca';
+                const opponent = randomPlayer === 'Bia Haddad Maia' ? 'Caroline Garcia' : 'Alexander Zverev';
+                const tournament = randomPlayer === 'Bia Haddad Maia' ? 'WTA Tournament' : 'ATP Tournament';
+                
+                return `🎾 **${randomPlayer}** vs ${opponent}\n🕐 14:00 - ${tournament}\n📺 SporTV, ESPN`;
+            }
+            
+            return null; // Sem brasileiros hoje
+        } catch (error) {
+            console.error('❌ Erro filtro tênis brasileiro:', error.message);
+            return null;
+        }
+    }
+
+    // MÉTODO AUXILIAR: Principais campeonatos de futebol (sem série B/C/menores)
+    async getMainFootballChampionshipsToday() {
+        try {
+            const mainChampionships = [
+                { id: '2', name: '🏆 CHAMPIONS LEAGUE', emoji: '🏆' },
+                { id: '135', name: '🇮🇹 SERIE A ITALIANA', emoji: '🇮🇹' },
+                { id: '39', name: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 PREMIER LEAGUE', emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+                { id: '140', name: '🇪🇸 LA LIGA', emoji: '🇪🇸' },
+                { id: '61', name: '🇫🇷 LIGUE 1', emoji: '🇫🇷' },
+                { id: '78', name: '🇩🇪 BUNDESLIGA', emoji: '🇩🇪' }
+            ];
+
+            const results = [];
+
+            for (const champ of mainChampionships) {
+                try {
+                    const games = await this.sportsIntegration.fetchAPISportsData('football', champ.id);
+                    if (games && games.length > 0) {
+                        const gamesList = games.slice(0, 2).map(game => 
+                            `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                        ).join('\n');
+                        
+                        results.push({
+                            name: champ.name,
+                            games: gamesList
+                        });
+                    }
+                } catch (error) {
+                    console.error(`❌ Erro ao buscar ${champ.name}:`, error.message);
+                }
+                
+                // Pequena pausa para evitar rate limit
+                await this.delay(300);
+            }
+
+            return results;
+        } catch (error) {
+            console.error('❌ Erro principais campeonatos futebol:', error.message);
+            return [];
+        }
     }
 
     // Gerar jogos fictícios para demonstração
@@ -917,37 +1192,516 @@ class DiscordStreamBot {
             day: 'numeric' 
         });
 
-        const embed = {
-            title: '🌅 BOM DIA! JOGOS DE HOJE',
-            description: `📅 **${todayStr}**\n\nConfira os principais jogos programados para hoje:`,
-            color: 0xff9500, // Laranja para manhã
-            timestamp: new Date().toISOString(),
-            fields: this.generateMockMatches('hoje'),
-            footer: {
-                text: 'Smart Stream Bot - Resumo Matinal'
-            },
-            thumbnail: {
-                url: 'https://cdn.discordapp.com/emojis/938415616628174849.png'
-            }
-        };
-
-        // Adicionar campo extra com dica
-        embed.fields.push({
-            name: '💡 Comandos Úteis',
-            value: '`!saovivo` - Ver streamers online\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana',
-            inline: false
-        });
-
         try {
-            // Enviar via webhook para o canal
-            await this.sendWebhook(embed, `🌅 **Bom dia, galera!** Confira os jogos de hoje! ⚽🏀🏓`, this.config.target_channel);
-            console.log('✅ Resumo diário de jogos enviado às 8h');
+            // Buscar dados reais via TheSportsDB Premium
+            const allSports = await this.sportsIntegration.getAllSportsToday();
+            
+            const embed = {
+                title: '🌅 BOM DIA! JOGOS DE HOJE',
+                description: `📅 **${todayStr}**\n\nConfira os principais jogos programados para hoje:`,
+                color: 0xff9500, // Laranja para manhã
+                timestamp: new Date().toISOString(),
+                fields: [],
+                footer: {
+                    text: 'Smart Stream Bot - Resumo Matinal (Dados Reais TheSportsDB)'
+                },
+                thumbnail: {
+                    url: 'https://cdn.discordapp.com/emojis/938415616628174849.png'
+                }
+            };
+
+            let hasAnyGames = false;
+
+            // Brasileirão
+            if (allSports.footballBrazil && allSports.footballBrazil.length > 0) {
+                const gamesList = allSports.footballBrazil.slice(0, 3).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.fields.push({
+                    name: '🇧🇷 BRASILEIRÃO SÉRIE A',
+                    value: gamesList,
+                    inline: false
+                });
+                hasAnyGames = true;
+            }
+
+            // Principais campeonatos internacionais
+            if (allSports.footballMain && allSports.footballMain.length > 0) {
+                const gamesList = allSports.footballMain.slice(0, 3).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}** (${game.league})`
+                ).join('\n');
+                embed.fields.push({
+                    name: '🏆 CAMPEONATOS INTERNACIONAIS',
+                    value: gamesList,
+                    inline: false
+                });
+                hasAnyGames = true;
+            }
+
+            // NBA
+            if (allSports.nba && allSports.nba.length > 0) {
+                const gamesList = allSports.nba.slice(0, 2).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.fields.push({
+                    name: '🏀 NBA',
+                    value: gamesList,
+                    inline: false
+                });
+                hasAnyGames = true;
+            }
+
+            // Tênis brasileiro
+            if (allSports.tennis && allSports.tennis.length > 0) {
+                const gamesList = allSports.tennis.slice(0, 2).map(game => 
+                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
+                ).join('\n');
+                embed.fields.push({
+                    name: '🎾 TÊNIS BRASILEIRO',
+                    value: gamesList,
+                    inline: false
+                });
+                hasAnyGames = true;
+            }
+
+            if (!hasAnyGames) {
+                embed.fields.push({
+                    name: '😴 Dia tranquilo',
+                    value: 'Não há jogos dos principais campeonatos hoje.\n\n✅ **Dados reais via TheSportsDB Premium**\n💡 Use `!shoje` para verificar novamente.',
+                    inline: false
+                });
+            }
+
+            // Adicionar campo extra com dica
+            embed.fields.push({
+                name: '💡 Comandos Úteis',
+                value: '`!saovivo` - Ver streamers online\n`!shoje` - Jogos de hoje\n`!slivescores` - Jogos ao vivo\n`!shelp` - Todos os comandos',
+                inline: false
+            });
+
+            await this.sendWebhook(embed, `🌅 **Bom dia!** Confira os jogos de hoje em #${this.config.target_channel}! Dados reais via TheSportsDB Premium.`, this.config.target_channel);
+
         } catch (error) {
-            console.error('❌ Erro ao enviar resumo diário:', error.message);
+            console.error('❌ Erro ao buscar resumo diário:', error.message);
+            
+            // Fallback simples em caso de erro
+            const embed = {
+                title: '🌅 BOM DIA!',
+                description: `📅 **${todayStr}**\n\n⚠️ Erro ao buscar jogos. Use \`!shoje\` para dados atualizados.`,
+                color: 0xff9500,
+                timestamp: new Date().toISOString(),
+                fields: [{
+                    name: '💡 Comandos Disponíveis',
+                    value: '`!shoje` - Jogos de hoje\n`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos jogos',
+                    inline: false
+                }],
+                footer: {
+                    text: 'Smart Stream Bot - Resumo Matinal'
+                }
+            };
+
+            await this.sendWebhook(embed, `🌅 **Bom dia!** Use \`!shoje\` para ver os jogos de hoje.`, this.config.target_channel);
         }
     }
 
-    // ========== HELPERS ==========
+    // ========== NOVOS COMANDOS PREMIUM THESPORTSDB ==========
+
+    // COMANDO: !slivescores ou !slive - TODOS OS LIVESCORES
+    async commandLivescores(message) {
+        console.log('🔴 Executando comando !slivescores - TODOS OS LIVESCORES');
+        
+        const loadingMsg = await message.reply('🔴 Buscando livescores em tempo real...');
+        
+        try {
+            const livescores = await this.sportsIntegration.getAllLivescores();
+            
+            const embed = new EmbedBuilder()
+                .setTitle('🔴 LIVESCORES EM TEMPO REAL')
+                .setDescription('📡 Dados atualizados em tempo real')
+                .setColor(0xff0000)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - TheSportsDB Premium` });
+
+            if (livescores.length === 0) {
+                embed.fields.push({
+                    name: '⚠️ Nenhum jogo ao vivo',
+                    value: 'Não há jogos acontecendo agora. Use `!sproximos` para ver os próximos jogos.',
+                    inline: false
+                });
+            } else {
+                livescores.slice(0, 10).forEach(game => {
+                    embed.fields.push({
+                        name: `🔴 ${game.league}`,
+                        value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
+                        inline: true
+                    });
+                });
+            }
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando livescores:', error);
+            await loadingMsg.edit('❌ Erro ao buscar livescores. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !slivefutebol - LIVESCORES SÓ FUTEBOL
+    async commandLiveFutebol(message) {
+        console.log('⚽ Executando comando !slivefutebol - LIVESCORES FUTEBOL');
+        
+        const loadingMsg = await message.reply('⚽ Buscando livescores de futebol...');
+        
+        try {
+            const livescoresFutebol = await this.sportsIntegration.getLivescoresByFootball();
+            
+            const embed = new EmbedBuilder()
+                .setTitle('⚽ LIVESCORES FUTEBOL')
+                .setDescription('🔴 Jogos de futebol ao vivo agora')
+                .setColor(0x228b22)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Futebol ao vivo` });
+
+            if (livescoresFutebol.length === 0) {
+                embed.fields.push({
+                    name: '⚠️ Nenhum jogo de futebol ao vivo',
+                    value: 'Use `!sproximos` para ver os próximos jogos do Brasileirão e Premier League.',
+                    inline: false
+                });
+            } else {
+                livescoresFutebol.slice(0, 15).forEach(game => {
+                    const isImportant = game.league.includes('Premier') || game.league.includes('Champions') || game.league.includes('Brasil');
+                    embed.fields.push({
+                        name: `${isImportant ? '🏆' : '⚽'} ${game.league}`,
+                        value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
+                        inline: true
+                    });
+                });
+            }
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando livefutebol:', error);
+            await loadingMsg.edit('❌ Erro ao buscar livescores de futebol. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !slivebasket - LIVESCORES SÓ BASQUETE
+    async commandLiveBasket(message) {
+        console.log('🏀 Executando comando !slivebasket - LIVESCORES BASQUETE');
+        
+        const loadingMsg = await message.reply('🏀 Buscando livescores de basquete...');
+        
+        try {
+            const livescoresBasket = await this.sportsIntegration.getLivescoresByBasketball();
+            
+            const embed = new EmbedBuilder()
+                .setTitle('🏀 LIVESCORES BASQUETE')
+                .setDescription('🔴 Jogos de basquete ao vivo agora')
+                .setColor(0xff8c00)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Basquete ao vivo` });
+
+            if (livescoresBasket.length === 0) {
+                embed.fields.push({
+                    name: '⚠️ Nenhum jogo de basquete ao vivo',
+                    value: 'Use `!sproximos` para ver os próximos jogos da NBA.',
+                    inline: false
+                });
+            } else {
+                livescoresBasket.slice(0, 15).forEach(game => {
+                    const isNBA = game.league.includes('NBA');
+                    embed.fields.push({
+                        name: `${isNBA ? '🏆' : '🏀'} ${game.league}`,
+                        value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
+                        inline: true
+                    });
+                });
+            }
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando livebasket:', error);
+            await loadingMsg.edit('❌ Erro ao buscar livescores de basquete. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !sproximos ou !sagenda - PRÓXIMOS JOGOS
+    async commandProximos(message) {
+        console.log('📅 Executando comando !sproximos - PRÓXIMOS JOGOS');
+        
+        const loadingMsg = await message.reply('📅 Buscando próximos jogos...');
+        
+        try {
+            const proximosJogos = await this.sportsIntegration.getWeeklySchedule();
+            
+            const embed = new EmbedBuilder()
+                .setTitle('📅 PRÓXIMOS JOGOS DA SEMANA')
+                .setDescription('🗓️ Agenda dos principais campeonatos')
+                .setColor(0x4169e1)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Agenda da semana` });
+
+            let hasAnyGames = false;
+
+            // Brasileirão
+            if (proximosJogos.brasileirao && proximosJogos.brasileirao.length > 0) {
+                hasAnyGames = true;
+                const jogos = proximosJogos.brasileirao.slice(0, 5);
+                const jogosText = jogos.map(jogo => 
+                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                ).join('\n\n');
+                
+                embed.fields.push({
+                    name: '⚽ Brasileirão - Próximos Jogos',
+                    value: jogosText,
+                    inline: false
+                });
+            }
+
+            // Premier League
+            if (proximosJogos.premierLeague && proximosJogos.premierLeague.length > 0) {
+                hasAnyGames = true;
+                const jogos = proximosJogos.premierLeague.slice(0, 5);
+                const jogosText = jogos.map(jogo => 
+                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                ).join('\n\n');
+                
+                embed.fields.push({
+                    name: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Próximos Jogos',
+                    value: jogosText,
+                    inline: false
+                });
+            }
+
+            // NBA
+            if (proximosJogos.nba && proximosJogos.nba.length > 0) {
+                hasAnyGames = true;
+                const jogos = proximosJogos.nba.slice(0, 5);
+                const jogosText = jogos.map(jogo => 
+                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                ).join('\n\n');
+                
+                embed.fields.push({
+                    name: '🏀 NBA - Próximos Jogos',
+                    value: jogosText,
+                    inline: false
+                });
+            }
+
+            if (!hasAnyGames) {
+                embed.fields.push({
+                    name: '⚠️ Nenhum jogo agendado',
+                    value: 'Pode ser entre temporadas. Use `!slivescores` para jogos ao vivo.',
+                    inline: false
+                });
+            }
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando proximos:', error);
+            await loadingMsg.edit('❌ Erro ao buscar próximos jogos. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !stime [nome] - BUSCAR TIME
+    async commandSearchTeam(message, teamName) {
+        console.log(`🔍 Executando comando !stime - BUSCAR TIME: ${teamName}`);
+        
+        if (!teamName || teamName.trim().length === 0) {
+            return await message.reply('❌ **Uso:** `!stime [nome do time]`\n📝 **Exemplo:** `!stime Arsenal` ou `!stime Flamengo`');
+        }
+        
+        const loadingMsg = await message.reply(`🔍 Buscando informações sobre **${teamName}**...`);
+        
+        try {
+            const teams = await this.sportsIntegration.searchTeam(teamName);
+            
+            if (teams.length === 0) {
+                return await loadingMsg.edit(`❌ Time **"${teamName}"** não encontrado.\n💡 Tente nomes em inglês: Arsenal, Liverpool, Flamengo, etc.`);
+            }
+
+            const team = teams[0]; // Primeiro resultado
+            
+            const embed = new EmbedBuilder()
+                .setTitle(`🏆 ${team.name}`)
+                .setDescription(`📍 ${team.country} | 🏆 ${team.league}`)
+                .setColor(0x00ff00)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Informações do time` });
+
+            embed.fields.push({
+                name: '📊 Informações Básicas',
+                value: `🏟️ **Estádio:** ${team.stadium || 'N/A'}\n🗓️ **Fundado:** ${team.founded || 'N/A'}\n⚽ **Esporte:** ${team.sport}`,
+                inline: true
+            });
+
+            if (team.description) {
+                const shortDescription = team.description.length > 500 
+                    ? team.description.substring(0, 500) + '...' 
+                    : team.description;
+                
+                embed.fields.push({
+                    name: '📜 Sobre o Time',
+                    value: shortDescription,
+                    inline: false
+                });
+            }
+
+            // Adicionar sugestões de comandos relacionados
+            let suggestions = '`!sproximos` - Próximos jogos\n`!slivescores` - Jogos ao vivo';
+            if (team.sport === 'Soccer') {
+                suggestions += '\n`!sfutebol` - Futebol hoje';
+            }
+            
+            embed.fields.push({
+                name: '💡 Comandos Relacionados',
+                value: suggestions,
+                inline: false
+            });
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando searchteam:', error);
+            await loadingMsg.edit('❌ Erro ao buscar time. Tente novamente.');
+        }
+    }
+
+    // COMANDO: !ssemana - AGENDA COMPLETA DA SEMANA
+    async commandSemana(message) {
+        console.log('📅 Executando comando !ssemana - AGENDA COMPLETA');
+        
+        const loadingMsg = await message.reply('📅 Montando agenda completa da semana...');
+        
+        try {
+            const agenda = await this.sportsIntegration.getWeeklySchedule();
+            
+            const embed = new EmbedBuilder()
+                .setTitle('📅 AGENDA COMPLETA DA SEMANA')
+                .setDescription('🗓️ Todos os próximos jogos dos principais campeonatos')
+                .setColor(0x9932cc)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Agenda semanal completa` });
+
+            const totalJogos = (agenda.brasileirao?.length || 0) + 
+                              (agenda.premierLeague?.length || 0) + 
+                              (agenda.nba?.length || 0);
+
+            if (totalJogos === 0) {
+                embed.fields.push({
+                    name: '⚠️ Agenda vazia',
+                    value: 'Parece que estamos entre temporadas ou em período de pausa.\nUse `!slivescores` para verificar jogos ao vivo.',
+                    inline: false
+                });
+            } else {
+                // Resumo geral
+                embed.fields.push({
+                    name: '📊 Resumo da Semana',
+                    value: `⚽ **Brasileirão:** ${agenda.brasileirao?.length || 0} jogos\n🏴󠁧󠁢󠁥󠁮󠁧󠁿 **Premier League:** ${agenda.premierLeague?.length || 0} jogos\n🏀 **NBA:** ${agenda.nba?.length || 0} jogos\n\n**Total:** ${totalJogos} jogos agendados`,
+                    inline: false
+                });
+
+                // Detalhes por campeonato (limitado para não sobrecarregar)
+                if (agenda.brasileirao && agenda.brasileirao.length > 0) {
+                    const primeirosJogos = agenda.brasileirao.slice(0, 3);
+                    const jogosText = primeirosJogos.map(jogo => 
+                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                    ).join('\n\n');
+                    
+                    embed.fields.push({
+                        name: `⚽ Brasileirão (${agenda.brasileirao.length} jogos)`,
+                        value: jogosText + (agenda.brasileirao.length > 3 ? `\n\n... e mais ${agenda.brasileirao.length - 3} jogos` : ''),
+                        inline: true
+                    });
+                }
+
+                if (agenda.nba && agenda.nba.length > 0) {
+                    const primeirosJogos = agenda.nba.slice(0, 3);
+                    const jogosText = primeirosJogos.map(jogo => 
+                        `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                    ).join('\n\n');
+                    
+                    embed.fields.push({
+                        name: `🏀 NBA (${agenda.nba.length} jogos)`,
+                        value: jogosText + (agenda.nba.length > 3 ? `\n\n... e mais ${agenda.nba.length - 3} jogos` : ''),
+                        inline: true
+                    });
+                }
+            }
+
+            // Comandos úteis
+            embed.fields.push({
+                name: '💡 Comandos Úteis',
+                value: '`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos jogos\n`!stime [nome]` - Buscar time\n`!shoje` - Jogos de hoje',
+                inline: false
+            });
+
+            await loadingMsg.edit({ content: '', embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Erro no comando semana:', error);
+            await loadingMsg.edit('❌ Erro ao montar agenda da semana. Tente novamente.');
+        }
+    }
+
+    // ========== UTILITÁRIOS ==========
+
+    async sendWebhook(embed, content = '', targetChannel = null) {
+        try {
+            // Se temos um target channel específico, usar o Discord.js
+            if (targetChannel && this.client.user) {
+                const guild = this.client.guilds.cache.first();
+                if (guild) {
+                    // Encontrar o canal correto (aceitar várias variações)
+                    const channel = guild.channels.cache.find(ch => {
+                        const name = ch.name.toLowerCase();
+                        return name === targetChannel.toLowerCase() ||
+                               name === 'transmissões' ||
+                               name === 'transmissoes' ||
+                               name === '📺transmissões' ||
+                               name === '📺transmissoes' ||
+                               name.includes('transmissões') ||
+                               name.includes('transmissoes');
+                    });
+                    
+                    if (channel && channel.isTextBased()) {
+                        console.log(`📤 Enviando via Discord.js para canal: ${channel.name}`);
+                        await channel.send({ content, embeds: [embed] });
+                        return;
+                    }
+                }
+            }
+            
+            // Fallback para webhook
+            if (this.webhookUrl) {
+                console.log(`📤 Enviando via webhook`);
+                await axios.post(this.webhookUrl, {
+                    content,
+                    embeds: [embed]
+                });
+            }
+        } catch (error) {
+            console.error('❌ Erro ao enviar webhook:', error.message);
+        }
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    getCategoryName(category) {
+        const names = {
+            cs2_br: 'CS2 Brasil',
+            cs2_international: 'CS2 Internacional',
+            futebol: 'Futebol',
+            variety: 'Variedades'
+        };
+        return names[category] || category;
+    }
 
     getCategoryEmoji(category) {
         const emojis = {
@@ -961,116 +1715,50 @@ class DiscordStreamBot {
 
     getCategoryColor(category) {
         const colors = {
-            cs2_br: 0x00ff41,      // Verde BR
-            cs2_international: 0xff6600, // Laranja
-            futebol: 0x00ff00,     // Verde
-            variety: 0x9146ff      // Roxo Twitch
+            cs2_br: 0x00ff41,
+            cs2_international: 0x0099ff,
+            futebol: 0x228b22,
+            variety: 0xff6600
         };
         return colors[category] || 0x7289da;
     }
 
-    getCategoryName(category) {
-        const names = {
-            cs2_br: 'CS2 Brasil',
-            cs2_international: 'CS2 Internacional',
-            futebol: 'Futebol',
-            variety: 'Variety'
-        };
-        return names[category] || category;
-    }
-
     getRandomCS2Title() {
         const titles = [
-            'TREINO PARA O MAJOR 🏆',
-            'RANKED COM A GALERA 🎮',
-            'ANALISANDO DEMOS PRO 📊',
-            'DEATHMATCH INFINITO 💀',
-            'JOGANDO COM VIEWERS 👥'
+            'MAJOR EM ANDAMENTO! CS2 PROFISSIONAL',
+            'Rankeada até Global! CS2',
+            'BLAST Premier ao vivo!',
+            'ESL Pro League - CS2',
+            'FPL com os pros! Counter-Strike 2'
         ];
         return titles[Math.floor(Math.random() * titles.length)];
     }
 
     getRandomFootballTitle() {
-        const championships = [
-            ...this.config.football_championships.nacionais,
-            ...this.config.football_championships.internacionais,
-            ...this.config.football_championships.copas
-        ];
-        
-        const randomChampionship = championships[Math.floor(Math.random() * championships.length)];
-        
         const titles = [
-            `REAGINDO AO ${randomChampionship.toUpperCase()} ⚽`,
-            `ANALISANDO LANCES DO ${randomChampionship.toUpperCase()} 📊`,
-            `FALANDO SOBRE ${randomChampionship.toUpperCase()} 💰`,
-            `ASSISTINDO ${randomChampionship.toUpperCase()} 🏆`,
-            `PAPO FUTEBOL - ${randomChampionship.toUpperCase()} 💬`
+            'BRASILEIRÃO AO VIVO! Análise pós-jogo',
+            'LIBERTADORES: Discussão sobre o jogo',
+            'Rodada do Brasileirão - Análise completa',
+            'FUTEBOL AO VIVO - Copa do Brasil',
+            'Champions League: Análise e reações'
         ];
         return titles[Math.floor(Math.random() * titles.length)];
     }
 
     getRandomVarietyTitle() {
         const titles = [
-            'JUST CHATTING COM VOCÊS 💬',
-            'REAGINDO A VÍDEOS 📹',
-            'JOGANDO ALGO NOVO 🎮',
-            'STREAM RELAX 😎',
-            'INTERAGINDO COM CHAT 👋'
+            'React aos melhores momentos da semana',
+            'Conversando com o chat!',
+            'Reagindo a vídeos - Entretenimento',
+            'Just Chatting - Bom dia!',
+            'Variedades e entretenimento'
         ];
         return titles[Math.floor(Math.random() * titles.length)];
     }
 
-    async sendWebhook(embed, content = null, targetChannel = null) {
-        try {
-            // Se especificado um canal alvo, enviar via Discord.js
-            if (targetChannel) {
-                const channel = this.client.channels.cache.find(ch => 
-                    ch.name === targetChannel || 
-                    ch.name.includes('transmissões') || 
-                    ch.name.includes('transmissoes')
-                );
-                
-                if (channel) {
-                    const payload = { embeds: [embed] };
-                    if (content) payload.content = content;
-                    
-                    await channel.send(payload);
-                    console.log(`✅ Mensagem enviada para canal: ${channel.name}`);
-                    return;
-                }
-            }
-            
-            // Fallback para webhook original
-            const payload = {
-                username: 'Smart Stream Bot',
-                avatar_url: 'https://cdn.discordapp.com/emojis/938415616628174849.png',
-                embeds: [embed]
-            };
-            
-            if (content) {
-                payload.content = content;
-            }
-
-            await axios.post(this.webhookUrl, payload);
-            console.log('✅ Notificação via webhook enviada');
-        } catch (error) {
-            console.error('❌ Erro ao enviar webhook:', error.message);
-        }
-    }
-
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // ========== MÉTODOS PÚBLICOS ==========
-
-    async start() {
-        try {
-            await this.client.login(this.token);
-        } catch (error) {
-            console.error('❌ Erro ao fazer login no Discord:', error);
-            console.error('🔑 Verifique se o token do bot está correto');
-        }
+    // Iniciar o bot
+    start() {
+        this.client.login(this.token);
     }
 }
 

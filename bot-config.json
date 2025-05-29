@@ -1,0 +1,91 @@
+{
+  "target_channel": "transmissões",
+  "apis": {
+    "api_futebol_token": null,
+    "api_sports_token": null
+  },
+  "streamers": {
+    "cs2_br": [
+      "gaules",
+      "fallen",
+      "coldzera",
+      "taco"
+    ],
+    "cs2_international": [
+      "esl_csgo",
+      "blast",
+      "hltv_org"
+    ],
+    "futebol": [
+      "casimito",
+      "loud_coringa",
+      "cosiq",
+      "warlillo",
+      "watos_",
+      "pagodedojorgin",
+      "dupladedoix",
+      "liraGOAT"
+    ],
+    "variety": [
+      "cellbit",
+      "bauky"
+    ]
+  },
+  "football_championships": {
+    "nacionais": [
+      "brasileirao",
+      "copa_brasil",
+      "estaduais"
+    ],
+    "internacionais": [
+      "libertadores",
+      "sulamericana"
+    ],
+    "copas": [
+      "copa_do_mundo",
+      "copa_america",
+      "copa_nordeste"
+    ]
+  },
+  "other_sports": {
+    "basketball": {
+      "nba": true,
+      "euroleague": true,
+      "nbb": true
+    },
+    "tennis": {
+      "atp": true,
+      "wta": true,
+      "grand_slams": true
+    },
+    "volleyball": {
+      "fivb": true,
+      "superliga_br": true
+    },
+    "hockey": {
+      "nhl": true
+    },
+    "baseball": {
+      "mlb": true
+    },
+    "american_football": {
+      "nfl": true
+    }
+  },
+  "notifications": {
+    "ping_everyone": true,
+    "min_viewers": 1000,
+    "cooldown_minutes": 30,
+    "include_thumbnails": true,
+    "mention_channel": true
+  },
+  "commands": {
+    "enabled": true,
+    "cooldown_seconds": 15,
+    "admin_only": false
+  },
+  "active_hours": {
+    "start": 8,
+    "end": 23
+  }
+}
