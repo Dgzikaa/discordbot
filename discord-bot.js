@@ -1555,8 +1555,10 @@ class DiscordStreamBot {
                 if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
                     totalImportantGames += sportsData.footballInternational.length;
                     
-                    // Mostrar TODOS os jogos importantes (sem limite aqui)
-                    const jogosText = sportsData.footballInternational.map(jogo => {
+                    // LIMITAR para max 8 jogos para não ultrapassar 1024 caracteres
+                    const limitedGames = sportsData.footballInternational.slice(0, 8);
+                    
+                    const jogosText = limitedGames.map(jogo => {
                         // Determinar canal baseado na liga
                         let canal = '📺 ESPN';
                         if (jogo.league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
@@ -1567,9 +1569,12 @@ class DiscordStreamBot {
                         return `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
                     }).join('\n\n');
                     
+                    const moreGamesText = sportsData.footballInternational.length > 8 ? 
+                        `\n\n💡 **+${sportsData.footballInternational.length - 8} outros jogos** - Use \`!sfutebol\` para ver todos` : '';
+                    
                     footballEmbed.addFields({
-                        name: `🏆 FUTEBOL INTERNACIONAL (${sportsData.footballInternational.length} jogos)`,
-                        value: jogosText,
+                        name: `🏆 FUTEBOL INTERNACIONAL (${limitedGames.length}/${sportsData.footballInternational.length} jogos)`,
+                        value: jogosText + moreGamesText,
                         inline: false
                     });
                 }
