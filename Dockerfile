@@ -3,7 +3,7 @@ FROM python:3.11-slim
 
 # Instalar Node.js
 RUN apt-get update && \
-    apt-get install -y curl && \
+    apt-get install -y curl dos2unix && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && \
@@ -23,12 +23,11 @@ RUN npm install
 # Copiar código fonte
 COPY . .
 
+# Converter para formato Unix e garantir permissão de execução
+RUN dos2unix /app/start.sh && chmod +x /app/start.sh
+
 # Expor portas
 EXPOSE 5000 3000
 
-# Script de inicialização
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
 # Comando para iniciar os serviços
-CMD ["/start.sh"] 
+CMD ["/app/start.sh"] 
