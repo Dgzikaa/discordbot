@@ -18,20 +18,30 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "discord.js": "^14.14.1",
     "axios": "^1.6.0",
-    "node-cron": "^3.0.3",
+    "discord.js": "^14.19.3",
     "dotenv": "^16.3.1",
-    "moment-timezone": "^0.5.43"
+    "moment-timezone": "^0.5.43",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["discord", "bot", "smart", "twitch", "futebol", "cs2", "streaming", "webhook", "railway"],
+  "keywords": [
+    "discord",
+    "bot",
+    "smart",
+    "twitch",
+    "futebol",
+    "cs2",
+    "streaming",
+    "webhook",
+    "railway"
+  ],
   "author": "Smart Stream Bot",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SEU_USER/smart-stream-bot.git"
   }
-} 
+}
