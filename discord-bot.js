@@ -1322,15 +1322,15 @@ class DiscordStreamBot {
                 .setTimestamp()
                 .setFooter({ text: `Smart Stream Bot - TheSportsDB Premium` });
 
-            if (livescores.length === 0) {
-                embed.fields.push({
+            if (!livescores || livescores.length === 0) {
+                embed.addFields({
                     name: '⚠️ Nenhum jogo ao vivo',
                     value: 'Não há jogos acontecendo agora. Use `!sproximos` para ver os próximos jogos.',
                     inline: false
                 });
             } else {
                 livescores.slice(0, 10).forEach(game => {
-                    embed.fields.push({
+                    embed.addFields({
                         name: `🔴 ${game.league}`,
                         value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
                         inline: true
@@ -1362,8 +1362,8 @@ class DiscordStreamBot {
                 .setTimestamp()
                 .setFooter({ text: `Smart Stream Bot - Futebol ao vivo` });
 
-            if (livescoresFutebol.length === 0) {
-                embed.fields.push({
+            if (!livescoresFutebol || livescoresFutebol.length === 0) {
+                embed.addFields({
                     name: '⚠️ Nenhum jogo de futebol ao vivo',
                     value: 'Use `!sproximos` para ver os próximos jogos do Brasileirão e Premier League.',
                     inline: false
@@ -1371,7 +1371,7 @@ class DiscordStreamBot {
             } else {
                 livescoresFutebol.slice(0, 15).forEach(game => {
                     const isImportant = game.league.includes('Premier') || game.league.includes('Champions') || game.league.includes('Brasil');
-                    embed.fields.push({
+                    embed.addFields({
                         name: `${isImportant ? '🏆' : '⚽'} ${game.league}`,
                         value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
                         inline: true
@@ -1403,8 +1403,8 @@ class DiscordStreamBot {
                 .setTimestamp()
                 .setFooter({ text: `Smart Stream Bot - Basquete ao vivo` });
 
-            if (livescoresBasket.length === 0) {
-                embed.fields.push({
+            if (!livescoresBasket || livescoresBasket.length === 0) {
+                embed.addFields({
                     name: '⚠️ Nenhum jogo de basquete ao vivo',
                     value: 'Use `!sproximos` para ver os próximos jogos da NBA.',
                     inline: false
@@ -1412,7 +1412,7 @@ class DiscordStreamBot {
             } else {
                 livescoresBasket.slice(0, 15).forEach(game => {
                     const isNBA = game.league.includes('NBA');
-                    embed.fields.push({
+                    embed.addFields({
                         name: `${isNBA ? '🏆' : '🏀'} ${game.league}`,
                         value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
                         inline: true
@@ -1454,7 +1454,7 @@ class DiscordStreamBot {
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                 ).join('\n\n');
                 
-                embed.fields.push({
+                embed.addFields({
                     name: '⚽ Brasileirão - Próximos Jogos',
                     value: jogosText,
                     inline: false
@@ -1469,7 +1469,7 @@ class DiscordStreamBot {
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                 ).join('\n\n');
                 
-                embed.fields.push({
+                embed.addFields({
                     name: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Próximos Jogos',
                     value: jogosText,
                     inline: false
@@ -1484,7 +1484,7 @@ class DiscordStreamBot {
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                 ).join('\n\n');
                 
-                embed.fields.push({
+                embed.addFields({
                     name: '🏀 NBA - Próximos Jogos',
                     value: jogosText,
                     inline: false
@@ -1492,7 +1492,7 @@ class DiscordStreamBot {
             }
 
             if (!hasAnyGames) {
-                embed.fields.push({
+                embed.addFields({
                     name: '⚠️ Nenhum jogo agendado',
                     value: 'Pode ser entre temporadas. Use `!slivescores` para jogos ao vivo.',
                     inline: false
