@@ -460,11 +460,8 @@ class DiscordStreamBot {
 
             // 3. TÊNIS (só com brasileiros: Bia Haddad Maia, João Fonseca, etc.) - ATUALIZADO
             const tennisGames = await this.sportsIntegration.getBrazilianTennisToday();
-            if (tennisGames.length > 0) {
-                const tennisText = tennisGames.slice(0, 2).map(game => 
-                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**`
-                ).join('\n');
-                embed.addFields({ name: '🎾 TÊNIS BRASILEIRO', value: tennisText, inline: false });
+            if (tennisGames) {
+                embed.addFields({ name: '🎾 TÊNIS BRASILEIRO', value: tennisGames, inline: false });
                 hasAnyGames = true;
             }
 
@@ -769,98 +766,156 @@ class DiscordStreamBot {
         await message.reply({ embeds: [embed] });
     }
 
-    // NOVO COMANDO: !sfutebol - SÓ FUTEBOL COMPLETO - ATUALIZADO PARA THESPORTSDB
+    // NOVO COMANDO: !sfutebol - TODOS OS JOGOS DO BRASILEIRÃO + FUTEBOL INTERNACIONAL (VERSÃO MÚLTIPLAS MENSAGENS)
     async commandFutebol(message) {
-        console.log('⚽ Executando comando !sfutebol - SÓ FUTEBOL PRINCIPAL');
+        console.log('⚽ Executando comando !sfutebol - TODOS OS JOGOS + MÚLTIPLAS MENSAGENS');
         
-        const loadingMsg = await message.reply('⚽ Buscando todos os principais campeonatos de futebol...');
+        const loadingMsg = await message.reply('⚽ Buscando TODOS os jogos de futebol (preparando múltiplas mensagens)...');
         
         try {
             const today = new Date().toLocaleDateString('pt-BR');
+            const embeds = [];
+
+            // ========== PARTE 1: TODOS OS JOGOS DO BRASILEIRÃO ==========
+            const allBrazilianGames = await this.sportsIntegration.getAllBrazilianFootballGames();
             
-            const embed = new EmbedBuilder()
-                .setTitle('⚽ FUTEBOL - PRINCIPAIS CAMPEONATOS')
-                .setDescription(`📅 ${today} - Só os principais campeonatos (sem série B/C)`)
-                .setColor(0x228b22)
-                .setTimestamp()
-                .setFooter({ text: `Smart Stream Bot - TheSportsDB Premium` });
+            if (allBrazilianGames && allBrazilianGames.length > 0) {
+                // Dividir todos os jogos do Brasileirão em chunks de 5 jogos por mensagem
+                const brasileiraoChunks = this.splitGamesIntoMessages(allBrazilianGames, 5);
+                
+                brasileiraoChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🇧🇷 BRASILEIRÃO SÉRIE A - TODOS OS JOGOS (${index + 1}/${brasileiraoChunks.length})`)
+                        .setDescription(`📅 ${today} - Dados reais 2025 (${allBrazilianGames.length} jogos totais)`)
+                        .setColor(0x009639) // Verde Brasil
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Brasileirão Real 2025` });
 
-            let hasAnyGames = false;
+                    const jogosText = chunk.map(jogo => 
+                        `⏰ **${jogo.time}** (${jogo.date}) - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV, Premiere**`
+                    ).join('\n\n');
+                    
+                    embed.addFields({
+                        name: `⚽ Jogos ${(index * 5) + 1}-${Math.min((index + 1) * 5, allBrazilianGames.length)} de ${allBrazilianGames.length}`,
+                        value: jogosText,
+                        inline: false
+                    });
 
-            // 1. BRASILEIRÃO SÉRIE A (sempre prioritário) - NOVO SISTEMA
-            const brasileiraoGames = await this.sportsIntegration.getBrazilianFootballToday();
-            if (brasileiraoGames.length > 0) {
-                const gamesList = brasileiraoGames.map(game => 
-                    `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}\n📺 Globo, SporTV`
-                ).join('\n\n');
-                embed.addFields({ name: '🇧🇷 BRASILEIRÃO SÉRIE A', value: gamesList, inline: false });
-                hasAnyGames = true;
+                    embeds.push(embed);
+                });
             }
 
-            // 2. PRINCIPAIS CAMPEONATOS INTERNACIONAIS - NOVO SISTEMA  
+            // ========== PARTE 2: FUTEBOL INTERNACIONAL PRINCIPAL ==========
             const mainChampionships = await this.sportsIntegration.getMainFootballChampionshipsToday();
             
-            if (mainChampionships.length > 0) {
-                // Organizar por liga
-                const leagueGroups = {};
-                mainChampionships.forEach(game => {
-                    if (!leagueGroups[game.league]) {
-                        leagueGroups[game.league] = [];
+            if (mainChampionships && mainChampionships.length > 0) {
+                // Organizar por liga e criar embeds separados
+                mainChampionships.forEach((leagueData, leagueIndex) => {
+                    const { league, games } = leagueData;
+                    
+                    if (games && games.length > 0) {
+                        // Filtrar só ligas principais (sem série B/C)
+                        const isMainLeague = 
+                            league.includes('Premier League') ||
+                            league.includes('La Liga') ||
+                            league.includes('Serie A') ||
+                            league.includes('Champions') ||
+                            league.includes('Bundesliga') ||
+                            league.includes('Ligue 1');
+
+                        if (isMainLeague) {
+                            // Dividir jogos da liga em chunks se necessário
+                            const leagueChunks = this.splitGamesIntoMessages(games, 6);
+                            
+                            leagueChunks.forEach((chunk, chunkIndex) => {
+                                const embed = new EmbedBuilder()
+                                    .setTitle(`🏆 ${league.toUpperCase()} ${leagueChunks.length > 1 ? `(${chunkIndex + 1}/${leagueChunks.length})` : ''}`)
+                                    .setDescription(`📅 ${today} - Principais campeonatos internacionais`)
+                                    .setColor(0x4169E1) // Azul internacional
+                                    .setTimestamp()
+                                    .setFooter({ text: `TheSportsDB Premium - ${league}` });
+
+                                const jogosText = chunk.map(game => {
+                                    // Determinar canal baseado na liga
+                                    let canal = '📺 ESPN';
+                                    if (league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
+                                    else if (league.includes('Premier')) canal = '📺 **ESPN, Star+**';
+                                    else if (league.includes('La Liga')) canal = '📺 **ESPN**';
+                                    else if (league.includes('Serie A')) canal = '📺 **ESPN**';
+                                    
+                                    return `⏰ **${game.time}** - ${game.status}\n🏆 **${game.homeTeam} x ${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}\n${canal}`;
+                                }).join('\n\n');
+
+                                // Emoji específico por liga
+                                let emoji = '🏆';
+                                if (league.includes('Premier')) emoji = '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
+                                else if (league.includes('La Liga')) emoji = '🇪🇸';
+                                else if (league.includes('Serie A')) emoji = '🇮🇹';
+                                else if (league.includes('Bundesliga')) emoji = '🇩🇪';
+                                else if (league.includes('Ligue')) emoji = '🇫🇷';
+                                else if (league.includes('Champions')) emoji = '⭐';
+
+                                embed.addFields({ 
+                                    name: `${emoji} ${chunk.length} Jogos Hoje`, 
+                                    value: jogosText, 
+                                    inline: false 
+                                });
+
+                                embeds.push(embed);
+                            });
+                        }
                     }
-                    leagueGroups[game.league].push(game);
                 });
-
-                // Mostrar cada liga separadamente com filtros
-                for (const [leagueName, games] of Object.entries(leagueGroups)) {
-                    // Filtrar só ligas principais (sem série B/C)
-                    const isMainLeague = 
-                        leagueName.includes('Premier League') ||
-                        leagueName.includes('La Liga') ||
-                        leagueName.includes('Serie A') ||
-                        leagueName.includes('Bundesliga') ||
-                        leagueName.includes('Ligue 1') ||
-                        leagueName.includes('Champions') ||
-                        leagueName.includes('Europa League');
-
-                    if (isMainLeague && games.length > 0) {
-                        const gamesList = games.slice(0, 3).map(game => 
-                            `🕐 ${game.time} - **${game.homeTeam}** vs **${game.awayTeam}**\n📍 ${game.venue || 'Estádio TBD'}`
-                        ).join('\n\n');
-
-                        // Emoji específico por liga
-                        let emoji = '🏆';
-                        if (leagueName.includes('Premier')) emoji = '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
-                        else if (leagueName.includes('La Liga')) emoji = '🇪🇸';
-                        else if (leagueName.includes('Serie A')) emoji = '🇮🇹';
-                        else if (leagueName.includes('Bundesliga')) emoji = '🇩🇪';
-                        else if (leagueName.includes('Ligue')) emoji = '🇫🇷';
-                        else if (leagueName.includes('Champions')) emoji = '⭐';
-
-                        embed.addFields({ 
-                            name: `${emoji} ${leagueName.toUpperCase()}`, 
-                            value: gamesList, 
-                            inline: false 
-                        });
-                        hasAnyGames = true;
-                    }
-                }
             }
 
-            if (!hasAnyGames) {
-                embed.addFields({ 
-                    name: '📅 Nenhum jogo hoje', 
-                    value: 'Não há jogos dos principais campeonatos hoje.\n\n✅ **Dados reais via TheSportsDB Premium**\n\n💡 **Filtros aplicados:**\n• ✅ Brasileirão Série A\n• ✅ Premier League, La Liga, Serie A\n• ✅ Champions League, Europa League\n• ✅ Bundesliga, Ligue 1\n\n• ❌ Série B, Série C\n• ❌ 2ª divisões\n• ❌ Campeonatos menores',
-                    inline: false 
+            // ========== EMBED FINAL: RESUMO DO FUTEBOL ==========
+            const totalBrazilian = allBrazilianGames?.length || 0;
+            const totalInternational = mainChampionships?.reduce((sum, league) => sum + (league.games?.length || 0), 0) || 0;
+            
+            const finalEmbed = new EmbedBuilder()
+                .setTitle('⚽ RESUMO COMPLETO DO FUTEBOL')
+                .setDescription('📊 Todos os jogos de futebol encontrados!')
+                .setColor(0x228B22) // Verde futebol
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - ${embeds.length + 1} mensagens enviadas` });
+
+            finalEmbed.addFields({
+                name: '📊 Total de Jogos',
+                value: `🇧🇷 **Brasileirão:** ${totalBrazilian} jogos\n🏆 **Internacional:** ${totalInternational} jogos\n⚽ **Total Geral:** ${totalBrazilian + totalInternational} jogos`,
+                inline: true
+            });
+
+            finalEmbed.addFields({
+                name: '🎯 Filtros Aplicados',
+                value: '✅ **BRASILEIRÃO:** Todos os jogos\n✅ **INTERNACIONAL:** Só principais\n• Champions League, Premier League\n• La Liga, Serie A, Bundesliga\n❌ **EXCLUÍDOS:** Série B, C, D',
+                inline: true
+            });
+
+            if (totalBrazilian > 0 || totalInternational > 0) {
+                finalEmbed.addFields({
+                    name: '💡 Comandos Relacionados',
+                    value: '`!slivescores` - Jogos ao vivo\n`!sproximos` - Próximos importantes\n`!stime Flamengo` - Buscar time\n`!slivebasket` - Basquete hoje',
+                    inline: false
                 });
             } else {
-                embed.addFields({ 
-                    name: '🎯 FILTROS APLICADOS', 
-                    value: '✅ **SÓ PRINCIPAIS CAMPEONATOS:**\n• 🇧🇷 Brasileirão Série A\n• ⭐ Champions League\n• 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League\n• 🇪🇸 La Liga, 🇮🇹 Serie A\n• 🇩🇪 Bundesliga, 🇫🇷 Ligue 1\n\n❌ **EXCLUÍDOS:**\n• Série B, Série C, Série D\n• 2ª divisão inglesa, alemã, etc.\n• Campeonatos estaduais menores\n• Ligas de divisões inferiores',
-                    inline: false 
+                finalEmbed.addFields({
+                    name: '📅 Nenhum jogo de futebol hoje',
+                    value: 'Não há jogos dos principais campeonatos hoje.\n\n✅ **Dados reais via TheSportsDB Premium**\n\n💡 **Tente:** `!slivescores` para jogos ao vivo ou `!sproximos` para próximos jogos.',
+                    inline: false
                 });
             }
 
-            await loadingMsg.edit({ content: null, embeds: [embed] });
+            embeds.push(finalEmbed);
+
+            // Enviar todas as mensagens
+            if (embeds.length > 0) {
+                await loadingMsg.delete();
+                await this.sendMultipleEmbeds(message, embeds, 1200); // 1.2s entre mensagens
+                console.log(`✅ Comando !sfutebol: ${embeds.length} mensagens enviadas com ${totalBrazilian + totalInternational} jogos!`);
+            } else {
+                await loadingMsg.edit({ content: '❌ Erro ao buscar jogos de futebol. Tente novamente.' });
+            }
+
         } catch (error) {
             console.error('❌ Erro comando futebol:', error.message);
             await loadingMsg.edit({ content: '❌ Erro ao buscar jogos de futebol. Tente novamente.' });
@@ -1390,39 +1445,157 @@ class DiscordStreamBot {
 
     // ========== NOVOS COMANDOS PREMIUM THESPORTSDB ==========
 
-    // COMANDO: !slivescores ou !slive - TODOS OS LIVESCORES
+    // COMANDO: !slivescores ou !slive - TODOS OS LIVESCORES (VERSÃO MÚLTIPLAS MENSAGENS)
     async commandLivescores(message) {
-        console.log('🔴 Executando comando !slivescores - TODOS OS LIVESCORES');
+        console.log('🔴 Executando comando !slivescores - LIVESCORES COM MÚLTIPLAS MENSAGENS');
         
-        const loadingMsg = await message.reply('🔴 Buscando livescores em tempo real...');
+        const loadingMsg = await message.reply('🔴 Buscando livescores em tempo real (preparando múltiplas mensagens)...');
         
         try {
             const livescores = await this.sportsIntegration.getAllLivescores();
             
-            const embed = new EmbedBuilder()
-                .setTitle('🔴 LIVESCORES EM TEMPO REAL')
-                .setDescription('📡 Dados atualizados em tempo real')
-                .setColor(0xff0000)
-                .setTimestamp()
-                .setFooter({ text: `Smart Stream Bot - TheSportsDB Premium` });
-
             if (!livescores || livescores.length === 0) {
-                embed.addFields({
-                    name: '⚠️ Nenhum jogo ao vivo',
-                    value: 'Não há jogos acontecendo agora. Use `!sproximos` para ver os próximos jogos.',
-                    inline: false
-                });
-            } else {
-                livescores.slice(0, 10).forEach(game => {
-                    embed.addFields({
-                        name: `🔴 ${game.league}`,
-                        value: `**${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`,
-                        inline: true
+                const embed = new EmbedBuilder()
+                    .setTitle('⚠️ NENHUM JOGO AO VIVO')
+                    .setDescription('📡 Não há jogos acontecendo agora')
+                    .setColor(0x808080)
+                    .setTimestamp()
+                    .setFooter({ text: `TheSportsDB Premium - Livescores` })
+                    .addFields({
+                        name: '💡 Sugestões',
+                        value: '`!sproximos` - Ver próximos jogos\n`!sfutebol` - Futebol completo\n`!shoje` - Jogos de hoje',
+                        inline: false
                     });
+
+                return await loadingMsg.edit({ content: '', embeds: [embed] });
+            }
+
+            const embeds = [];
+
+            // Separar por esporte
+            const soccerLive = livescores.filter(game => game.sport === 'Soccer' || game.league.toLowerCase().includes('football'));
+            const basketballLive = livescores.filter(game => game.sport === 'Basketball' || game.league.toLowerCase().includes('basketball'));
+            const otherSports = livescores.filter(game => 
+                !soccerLive.includes(game) && !basketballLive.includes(game)
+            );
+
+            // ========== FUTEBOL AO VIVO ==========
+            if (soccerLive.length > 0) {
+                const soccerChunks = this.splitGamesIntoMessages(soccerLive, 8);
+                
+                soccerChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`⚽ FUTEBOL AO VIVO ${soccerChunks.length > 1 ? `(${index + 1}/${soccerChunks.length})` : ''}`)
+                        .setDescription('🔴 Jogos de futebol acontecendo agora')
+                        .setColor(0x228B22)
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Futebol Live` });
+
+                    const gamesList = chunk.map(game => 
+                        `🔴 **${game.league}**\n⚽ **${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`
+                    );
+
+                    // Dividir em campos se necessário
+                    const fieldChunks = this.splitTextIntoChunks(gamesList.join('\n\n'), 1000);
+                    
+                    fieldChunks.forEach((fieldContent, fieldIndex) => {
+                        embed.addFields({
+                            name: fieldIndex === 0 ? `⚽ ${chunk.length} Jogos ao Vivo` : `⚽ Continuação ${fieldIndex + 1}`,
+                            value: fieldContent,
+                            inline: false
+                        });
+                    });
+
+                    embeds.push(embed);
                 });
             }
 
-            await loadingMsg.edit({ content: '', embeds: [embed] });
+            // ========== BASQUETE AO VIVO ==========
+            if (basketballLive.length > 0) {
+                const basketChunks = this.splitGamesIntoMessages(basketballLive, 10);
+                
+                basketChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🏀 BASQUETE AO VIVO ${basketChunks.length > 1 ? `(${index + 1}/${basketChunks.length})` : ''}`)
+                        .setDescription('🔴 Jogos de basquete acontecendo agora')
+                        .setColor(0xFF8C00)
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Basquete Live` });
+
+                    const gamesList = chunk.map(game => 
+                        `🔴 **${game.league}**\n🏀 **${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`
+                    );
+
+                    const fieldChunks = this.splitTextIntoChunks(gamesList.join('\n\n'), 1000);
+                    
+                    fieldChunks.forEach((fieldContent, fieldIndex) => {
+                        embed.addFields({
+                            name: fieldIndex === 0 ? `🏀 ${chunk.length} Jogos ao Vivo` : `🏀 Continuação ${fieldIndex + 1}`,
+                            value: fieldContent,
+                            inline: false
+                        });
+                    });
+
+                    embeds.push(embed);
+                });
+            }
+
+            // ========== OUTROS ESPORTES AO VIVO ==========
+            if (otherSports.length > 0) {
+                const otherChunks = this.splitGamesIntoMessages(otherSports, 12);
+                
+                otherChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🏅 OUTROS ESPORTES AO VIVO ${otherChunks.length > 1 ? `(${index + 1}/${otherChunks.length})` : ''}`)
+                        .setDescription('🔴 Tênis, Hockey, Volleyball e mais')
+                        .setColor(0x9932CC)
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Outros Esportes` });
+
+                    const gamesList = chunk.map(game => 
+                        `🔴 **${game.league}**\n🏅 **${game.homeTeam} ${game.homeScore} x ${game.awayScore} ${game.awayTeam}**\n📍 ${game.venue}\n⏰ ${game.progress || game.minute || 'Ao vivo'}`
+                    );
+
+                    const fieldChunks = this.splitTextIntoChunks(gamesList.join('\n\n'), 1000);
+                    
+                    fieldChunks.forEach((fieldContent, fieldIndex) => {
+                        embed.addFields({
+                            name: fieldIndex === 0 ? `🏅 ${chunk.length} Jogos ao Vivo` : `🏅 Continuação ${fieldIndex + 1}`,
+                            value: fieldContent,
+                            inline: false
+                        });
+                    });
+
+                    embeds.push(embed);
+                });
+            }
+
+            // ========== RESUMO FINAL DOS LIVESCORES ==========
+            const summaryEmbed = new EmbedBuilder()
+                .setTitle('🔴 RESUMO DOS LIVESCORES')
+                .setDescription('📊 Todos os jogos ao vivo encontrados!')
+                .setColor(0xFF0000)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - ${embeds.length + 1} mensagens enviadas` });
+
+            summaryEmbed.addFields({
+                name: '📊 Total de Jogos ao Vivo',
+                value: `⚽ **Futebol:** ${soccerLive.length} jogos\n🏀 **Basquete:** ${basketballLive.length} jogos\n🏅 **Outros:** ${otherSports.length} jogos\n🔴 **Total:** ${livescores.length} jogos`,
+                inline: true
+            });
+
+            summaryEmbed.addFields({
+                name: '💡 Comandos Relacionados',
+                value: '`!slivefutebol` - Só futebol live\n`!slivebasket` - Só basquete live\n`!sproximos` - Próximos jogos\n`!sfutebol` - Futebol completo',
+                inline: true
+            });
+
+            embeds.push(summaryEmbed);
+
+            // Enviar todas as mensagens
+            await loadingMsg.delete();
+            await this.sendMultipleEmbeds(message, embeds, 1000);
+            console.log(`✅ Comando !slivescores: ${embeds.length} mensagens enviadas com ${livescores.length} jogos ao vivo!`);
 
         } catch (error) {
             console.error('❌ Erro no comando livescores:', error);
@@ -1512,53 +1685,64 @@ class DiscordStreamBot {
         }
     }
 
-    // COMANDO: !sproximos ou !sagenda - PRÓXIMOS JOGOS
+    // COMANDO: !sproximos ou !sagenda - PRÓXIMOS JOGOS (VERSÃO MÚLTIPLAS MENSAGENS)
     async commandProximos(message) {
-        console.log('📅 Executando comando !sproximos - PRÓXIMOS JOGOS IMPORTANTES');
+        console.log('📅 Executando comando !sproximos - PRÓXIMOS JOGOS COM DIVISÃO AUTOMÁTICA');
         
-        const loadingMsg = await message.reply('🎯 Buscando jogos IMPORTANTES...');
+        const loadingMsg = await message.reply('🎯 Buscando jogos importantes e dividindo automaticamente...');
         
         try {
-            // Usar o novo método com filtros inteligentes
+            // Usar o método com filtros inteligentes
             const sportsData = await this.sportsIntegration.getAllImportantSportsToday();
             
             let totalImportantGames = 0;
-            let messagesSent = 0;
+            const embeds = [];
 
-            // ========== MENSAGEM 1: FUTEBOL ==========
-            if ((sportsData.footballBrazil && sportsData.footballBrazil.length > 0) || 
-                (sportsData.footballInternational && sportsData.footballInternational.length > 0)) {
+            // ========== EMBED 1: FUTEBOL BRASILEIRO ==========
+            if (sportsData.footballBrazil && sportsData.footballBrazil.length > 0) {
+                totalImportantGames += sportsData.footballBrazil.length;
                 
-                const footballEmbed = new EmbedBuilder()
-                    .setTitle('⚽ FUTEBOL HOJE')
-                    .setDescription('🇧🇷 Brasileirão + 🏆 Principais Campeonatos')
-                    .setColor(0x228B22) // Verde futebol
-                    .setTimestamp()
-                    .setFooter({ text: `TheSportsDB Premium - Dados Reais` });
+                // Dividir jogos do Brasileirão em chunks de 4 jogos por mensagem
+                const brasileiraoChunks = this.splitGamesIntoMessages(sportsData.footballBrazil, 4);
+                
+                brasileiraoChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🇧🇷 BRASILEIRÃO SÉRIE A ${brasileiraoChunks.length > 1 ? `(${index + 1}/${brasileiraoChunks.length})` : ''}`)
+                        .setDescription('⚽ Dados reais do Brasileirão 2025')
+                        .setColor(0x009639) // Verde Brasil
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Brasileirão Real` });
 
-                // BRASILEIRÃO
-                if (sportsData.footballBrazil && sportsData.footballBrazil.length > 0) {
-                    totalImportantGames += sportsData.footballBrazil.length;
-                    
-                    const jogosText = sportsData.footballBrazil.map(jogo => 
-                        `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n📺 **Globo, SporTV**`
+                    const jogosText = chunk.map(jogo => 
+                        `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n🏆 ${jogo.round}\n📺 **Globo, SporTV**`
                     ).join('\n\n');
                     
-                    footballEmbed.addFields({
-                        name: `🇧🇷 BRASILEIRÃO SÉRIE A (${sportsData.footballBrazil.length} jogos)`,
+                    embed.addFields({
+                        name: `⚽ ${chunk.length} Jogos do Brasileirão`,
                         value: jogosText,
                         inline: false
                     });
-                }
 
-                // FUTEBOL INTERNACIONAL
-                if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
-                    totalImportantGames += sportsData.footballInternational.length;
-                    
-                    // LIMITAR para max 8 jogos para não ultrapassar 1024 caracteres
-                    const limitedGames = sportsData.footballInternational.slice(0, 8);
-                    
-                    const jogosText = limitedGames.map(jogo => {
+                    embeds.push(embed);
+                });
+            }
+
+            // ========== EMBED 2: FUTEBOL INTERNACIONAL ==========
+            if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
+                totalImportantGames += sportsData.footballInternational.length;
+                
+                // Dividir futebol internacional em chunks de 6 jogos por mensagem
+                const internationalChunks = this.splitGamesIntoMessages(sportsData.footballInternational, 6);
+                
+                internationalChunks.forEach((chunk, index) => {
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🏆 FUTEBOL INTERNACIONAL ${internationalChunks.length > 1 ? `(${index + 1}/${internationalChunks.length})` : ''}`)
+                        .setDescription('🌍 Principais campeonatos europeus')
+                        .setColor(0x4169E1) // Azul internacional
+                        .setTimestamp()
+                        .setFooter({ text: `TheSportsDB Premium - Dados Reais` });
+
+                    const jogosText = chunk.map(jogo => {
                         // Determinar canal baseado na liga
                         let canal = '📺 ESPN';
                         if (jogo.league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
@@ -1569,31 +1753,20 @@ class DiscordStreamBot {
                         return `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
                     }).join('\n\n');
                     
-                    const moreGamesText = sportsData.footballInternational.length > 8 ? 
-                        `\n\n💡 **+${sportsData.footballInternational.length - 8} outros jogos** - Use \`!sfutebol\` para ver todos` : '';
-                    
-                    footballEmbed.addFields({
-                        name: `🏆 FUTEBOL INTERNACIONAL (${limitedGames.length}/${sportsData.footballInternational.length} jogos)`,
-                        value: jogosText + moreGamesText,
+                    embed.addFields({
+                        name: `🌍 ${chunk.length} Jogos Internacionais`,
+                        value: jogosText,
                         inline: false
                     });
-                }
 
-                await message.channel.send({ embeds: [footballEmbed] });
-                messagesSent++;
+                    embeds.push(embed);
+                });
             }
 
-            // ========== MENSAGEM 2: BASQUETE ==========
+            // ========== EMBED 3: BASQUETE ==========
             if (sportsData.nba && sportsData.nba.length > 0) {
                 totalImportantGames += sportsData.nba.length;
                 
-                const basketEmbed = new EmbedBuilder()
-                    .setTitle('🏀 BASQUETE HOJE')
-                    .setDescription('🇺🇸 NBA + 🌍 Ligas Internacionais')
-                    .setColor(0xFF8C00) // Laranja basquete
-                    .setTimestamp()
-                    .setFooter({ text: `TheSportsDB Premium - TODOS os jogos` });
-
                 // Separar NBA real de outras ligas
                 const nbaGames = sportsData.nba.filter(jogo => 
                     jogo.league.includes('NBA') || jogo.league.includes('WNBA')
@@ -1602,56 +1775,75 @@ class DiscordStreamBot {
                     !jogo.league.includes('NBA') && !jogo.league.includes('WNBA')
                 );
 
-                // NBA PRINCIPAL
+                // NBA principal (chunks de 8 jogos)
                 if (nbaGames.length > 0) {
-                    const nbaText = nbaGames.map(jogo => {
-                        const canal = jogo.league.includes('WNBA') ? '📺 **ESPN, Amazon Prime**' : '📺 **ESPN, NBA League Pass**';
-                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n${canal}`;
-                    }).join('\n\n');
+                    const nbaChunks = this.splitGamesIntoMessages(nbaGames, 8);
                     
-                    basketEmbed.addFields({
-                        name: `🇺🇸 NBA + WNBA (${nbaGames.length} jogos)`,
-                        value: nbaText,
-                        inline: false
-                    });
-                }
+                    nbaChunks.forEach((chunk, index) => {
+                        const embed = new EmbedBuilder()
+                            .setTitle(`🏀 NBA + WNBA ${nbaChunks.length > 1 ? `(${index + 1}/${nbaChunks.length})` : ''}`)
+                            .setDescription('🇺🇸 Basquete americano oficial')
+                            .setColor(0xFF8C00) // Laranja basquete
+                            .setTimestamp()
+                            .setFooter({ text: `TheSportsDB Premium - TODOS os jogos` });
 
-                // OUTRAS LIGAS DE BASQUETE
-                if (otherBasketball.length > 0) {
-                    const otherText = otherBasketball.slice(0, 15).map(jogo => {
-                        let canal = '📺 ESPN';
-                        if (jogo.league.includes('EuroLeague')) canal = '📺 **ESPN**';
-                        else if (jogo.league.includes('Spanish')) canal = '📺 **ESPN**';
-                        else if (jogo.league.includes('Turkish')) canal = '📺 **ESPN**';
+                        const nbaText = chunk.map(jogo => {
+                            const canal = jogo.league.includes('WNBA') ? '📺 **ESPN, Amazon Prime**' : '📺 **ESPN, NBA League Pass**';
+                            return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n${canal}`;
+                        }).join('\n\n');
                         
-                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
-                    }).join('\n\n');
-                    
-                    const moreText = otherBasketball.length > 15 ? `\n\n💡 **+${otherBasketball.length - 15} outros jogos**` : '';
-                    
-                    basketEmbed.addFields({
-                        name: `🌍 BASQUETE INTERNACIONAL (${otherBasketball.length} jogos)`,
-                        value: otherText + moreText,
-                        inline: false
+                        embed.addFields({
+                            name: `🇺🇸 ${chunk.length} Jogos NBA/WNBA`,
+                            value: nbaText,
+                            inline: false
+                        });
+
+                        embeds.push(embed);
                     });
                 }
 
-                await message.channel.send({ embeds: [basketEmbed] });
-                messagesSent++;
+                // Basquete internacional (chunks de 10 jogos)
+                if (otherBasketball.length > 0) {
+                    const otherChunks = this.splitGamesIntoMessages(otherBasketball, 10);
+                    
+                    otherChunks.forEach((chunk, index) => {
+                        const embed = new EmbedBuilder()
+                            .setTitle(`🌍 BASQUETE INTERNACIONAL ${otherChunks.length > 1 ? `(${index + 1}/${otherChunks.length})` : ''}`)
+                            .setDescription('🏀 Ligas europeias e mundiais')
+                            .setColor(0xDAA520) // Dourado
+                            .setTimestamp()
+                            .setFooter({ text: `TheSportsDB Premium - Ligas Mundiais` });
+
+                        const otherText = chunk.map(jogo => {
+                            let canal = '📺 ESPN';
+                            if (jogo.league.includes('EuroLeague')) canal = '📺 **ESPN**';
+                            
+                            return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
+                        }).join('\n\n');
+                        
+                        embed.addFields({
+                            name: `🌍 ${chunk.length} Jogos Internacionais`,
+                            value: otherText,
+                            inline: false
+                        });
+
+                        embeds.push(embed);
+                    });
+                }
             }
 
-            // ========== MENSAGEM FINAL: RESUMO ==========
-            if (messagesSent > 0) {
+            // ========== EMBED FINAL: RESUMO ==========
+            if (embeds.length > 0) {
                 const summaryEmbed = new EmbedBuilder()
-                    .setTitle('🎯 RESUMO DOS JOGOS IMPORTANTES')
-                    .setDescription('📊 Filtros inteligentes aplicados com sucesso!')
+                    .setTitle('🎯 RESUMO COMPLETO DOS JOGOS')
+                    .setDescription('📊 Sistema de múltiplas mensagens ativo!')
                     .setColor(0xFFD700) // Dourado
                     .setTimestamp()
-                    .setFooter({ text: `Smart Stream Bot - Dados reais via TheSportsDB Premium` });
+                    .setFooter({ text: `Smart Stream Bot - ${embeds.length + 1} mensagens enviadas` });
 
                 summaryEmbed.addFields({
-                    name: '📊 Total de Jogos Selecionados',
-                    value: `✅ **${totalImportantGames}** jogos importantes encontrados\n🇧🇷 Brasileirão: ${sportsData.footballBrazil?.length || 0}\n⚽ Futebol Internacional: ${sportsData.footballInternational?.length || 0}\n🏀 Basquete: ${sportsData.nba?.length || 0}`,
+                    name: '📊 Total de Jogos Encontrados',
+                    value: `✅ **${totalImportantGames}** jogos importantes\n🇧🇷 Brasileirão: ${sportsData.footballBrazil?.length || 0}\n⚽ Internacional: ${sportsData.footballInternational?.length || 0}\n🏀 Basquete: ${sportsData.nba?.length || 0}`,
                     inline: true
                 });
 
@@ -1663,18 +1855,24 @@ class DiscordStreamBot {
 
                 summaryEmbed.addFields({
                     name: '💡 Comandos Relacionados',
-                    value: '`!slivescores` - Jogos ao vivo\n`!sfutebol` - Só futebol\n`!slivebasket` - Só basquete\n`!stime Arsenal` - Buscar time',
+                    value: '`!slivescores` - Jogos ao vivo\n`!sfutebol` - Só futebol completo\n`!slivebasket` - Só basquete\n`!stime Arsenal` - Buscar time',
                     inline: false
                 });
 
-                await message.channel.send({ embeds: [summaryEmbed] });
+                embeds.push(summaryEmbed);
+            }
+
+            // Enviar todas as mensagens
+            if (embeds.length > 0) {
                 await loadingMsg.delete();
+                await this.sendMultipleEmbeds(message, embeds, 1500); // 1.5s entre mensagens
+                console.log(`✅ Enviadas ${embeds.length} mensagens com ${totalImportantGames} jogos!`);
             } else {
-                // Nenhum jogo importante encontrado
+                // Nenhum jogo encontrado
                 const noGamesEmbed = new EmbedBuilder()
                     .setTitle('⚠️ NENHUM JOGO IMPORTANTE HOJE')
                     .setDescription('Não há eventos relevantes programados para hoje')
-                    .setColor(0x808080) // Cinza
+                    .setColor(0x808080)
                     .setTimestamp()
                     .setFooter({ text: `TheSportsDB Premium - Dados reais` });
 
@@ -1868,6 +2066,93 @@ class DiscordStreamBot {
     // Iniciar o bot
     start() {
         this.client.login(this.token);
+    }
+
+    // ========== UTILITÁRIOS DE DIVISÃO DE MENSAGENS ==========
+
+    // Dividir texto em chunks respeitando limite de caracteres
+    splitTextIntoChunks(text, maxLength = 1000) {
+        if (text.length <= maxLength) {
+            return [text];
+        }
+
+        const chunks = [];
+        const lines = text.split('\n');
+        let currentChunk = '';
+
+        for (const line of lines) {
+            const testChunk = currentChunk + (currentChunk ? '\n' : '') + line;
+            
+            if (testChunk.length <= maxLength) {
+                currentChunk = testChunk;
+            } else {
+                if (currentChunk) {
+                    chunks.push(currentChunk);
+                }
+                
+                // Se uma linha sozinha é maior que o limite, dividir ela
+                if (line.length > maxLength) {
+                    const lineChunks = this.splitLongLine(line, maxLength);
+                    chunks.push(...lineChunks);
+                    currentChunk = '';
+                } else {
+                    currentChunk = line;
+                }
+            }
+        }
+
+        if (currentChunk) {
+            chunks.push(currentChunk);
+        }
+
+        return chunks;
+    }
+
+    // Dividir linha muito longa
+    splitLongLine(line, maxLength) {
+        const chunks = [];
+        let currentPos = 0;
+
+        while (currentPos < line.length) {
+            const chunk = line.substring(currentPos, currentPos + maxLength);
+            chunks.push(chunk);
+            currentPos += maxLength;
+        }
+
+        return chunks;
+    }
+
+    // Dividir jogos em grupos para múltiplas mensagens
+    splitGamesIntoMessages(games, gamesPerMessage = 8) {
+        const messages = [];
+        
+        for (let i = 0; i < games.length; i += gamesPerMessage) {
+            const gameGroup = games.slice(i, i + gamesPerMessage);
+            messages.push(gameGroup);
+        }
+
+        return messages;
+    }
+
+    // Criar múltiplas mensagens de embed automaticamente
+    async sendMultipleEmbeds(message, embeds, delayBetween = 1000) {
+        const results = [];
+        
+        for (let i = 0; i < embeds.length; i++) {
+            try {
+                const sent = await message.channel.send({ embeds: [embeds[i]] });
+                results.push(sent);
+                
+                // Delay entre mensagens para evitar rate limit
+                if (i < embeds.length - 1) {
+                    await this.delay(delayBetween);
+                }
+            } catch (error) {
+                console.error(`❌ Erro ao enviar embed ${i + 1}:`, error.message);
+            }
+        }
+        
+        return results;
     }
 }
 

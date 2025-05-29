@@ -407,6 +407,78 @@ class SportsIntegrationTheSportsDBCorreto {
         return results;
     }
 
+    // NOVO MÉTODO: Principais campeonatos de futebol internacional
+    async getMainFootballChampionshipsToday() {
+        console.log('🏆 Buscando principais campeonatos de futebol hoje...');
+        
+        try {
+            // Buscar jogos de futebol importante
+            const importantGames = await this.getImportantSoccerToday();
+            
+            // Organizar por liga
+            const leagueGroups = {};
+            importantGames.forEach(game => {
+                const leagueName = game.league;
+                if (!leagueGroups[leagueName]) {
+                    leagueGroups[leagueName] = [];
+                }
+                leagueGroups[leagueName].push(game);
+            });
+
+            // Converter para array de objetos
+            const result = [];
+            for (const [leagueName, games] of Object.entries(leagueGroups)) {
+                result.push({
+                    league: leagueName,
+                    games: games
+                });
+            }
+
+            console.log(`✅ ${result.length} ligas com jogos hoje encontradas`);
+            return result;
+
+        } catch (error) {
+            console.error('❌ Erro ao buscar principais campeonatos:', error.message);
+            return [];
+        }
+    }
+
+    // MÉTODO EXPANDIDO: Retornar TODOS os jogos do Brasileirão (para múltiplas mensagens)
+    async getAllBrazilianFootballGames() {
+        console.log('⚽ Buscando TODOS os jogos do Brasileirão (incluindo próximos)...');
+        
+        // Usar dados reais do Brasileirão 2025
+        const allGames = this.getRealBrasileirao2025Data();
+        
+        const upcomingGames = [];
+        
+        allGames.forEach(game => {
+            if (game.data_realizacao_iso) {
+                upcomingGames.push({
+                    time: new Date(game.data_realizacao_iso).toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    }),
+                    date: new Date(game.data_realizacao_iso).toLocaleDateString('pt-BR'),
+                    homeTeam: game.time_mandante.nome_popular,
+                    awayTeam: game.time_visitante.nome_popular,
+                    homeScore: game.placar_mandante,
+                    awayScore: game.placar_visitante,
+                    status: this.translateStatus(game.status),
+                    league: 'Brasileirão Série A 2025',
+                    venue: game.estadio.nome_popular,
+                    round: `${game.rodada}ª Rodada`,
+                    id: game.partida_id,
+                    isLive: game.status === 'ao_vivo',
+                    priority: 'HIGH'
+                });
+            }
+        });
+
+        console.log(`✅ Encontrados ${upcomingGames.length} jogos TOTAIS do Brasileirão!`);
+        return upcomingGames;
+    }
+
     getGamePriority(event) {
         const league = event.strLeague || '';
         
