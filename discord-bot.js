@@ -51,8 +51,8 @@ class DiscordStreamBot {
             // Verificar se é no canal correto
             if (message.channel.name !== this.channelName) return;
             
-            // Verificar se é um comando
-            if (!message.content.startsWith('!')) return;
+            // Verificar se é um comando que começa com !s
+            if (!message.content.startsWith('!s')) return;
             
             // Processar comando
             await this.processCommand(message);
@@ -169,14 +169,14 @@ class DiscordStreamBot {
     // Mostrar comandos disponíveis
     showAvailableCommands() {
         console.log('🤖 COMANDOS DISPONÍVEIS:');
-        console.log('!aovivo - Verificar streamers online');
-        console.log('!hoje - Jogos de hoje');
-        console.log('!amanha - Jogos de amanhã');
-        console.log('!semana - Jogos da semana');
-        console.log('!config - Configurações do bot');
-        console.log('!help - Lista de comandos');
-        console.log('!ping - Testar bot');
-        console.log('!stats - Estatísticas');
+        console.log('!saovivo - Verificar streamers online');
+        console.log('!shoje - Jogos de hoje');
+        console.log('!samanha - Jogos de amanhã');
+        console.log('!ssemana - Jogos da semana');
+        console.log('!sconfig - Configurações do bot');
+        console.log('!shelp - Lista de comandos');
+        console.log('!sping - Testar bot');
+        console.log('!sstats - Estatísticas');
         console.log('');
     }
 
@@ -197,21 +197,21 @@ class DiscordStreamBot {
 
         try {
             switch (command) {
-                case '!aovivo':
+                case '!saovivo':
                     return await this.commandAoVivo(message);
-                case '!hoje':
+                case '!shoje':
                     return await this.commandHoje(message);
-                case '!amanha':
+                case '!samanha':
                     return await this.commandAmanha(message);
-                case '!semana':
+                case '!ssemana':
                     return await this.commandSemana(message);
-                case '!config':
+                case '!sconfig':
                     return await this.commandConfig(message);
-                case '!help':
+                case '!shelp':
                     return await this.commandHelp(message);
-                case '!ping':
+                case '!sping':
                     return await this.commandPing(message);
-                case '!stats':
+                case '!sstats':
                     return await this.commandStats(message);
                 default:
                     return null; // Comando não reconhecido
@@ -241,7 +241,7 @@ class DiscordStreamBot {
     // ========== COMANDOS ==========
 
     async commandAoVivo(message) {
-        console.log('🔍 Executando comando !aovivo');
+        console.log('🔍 Executando comando !saovivo');
         
         const loadingMsg = await message.reply('🔍 Verificando streamers online...');
         
@@ -318,7 +318,7 @@ class DiscordStreamBot {
     }
 
     async commandHoje(message) {
-        console.log('📅 Executando comando !hoje');
+        console.log('📅 Executando comando !shoje');
         
         const today = new Date();
         const todayStr = today.toLocaleDateString('pt-BR');
@@ -337,7 +337,7 @@ class DiscordStreamBot {
     }
 
     async commandAmanha(message) {
-        console.log('📅 Executando comando !amanha');
+        console.log('📅 Executando comando !samanha');
         
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -357,7 +357,7 @@ class DiscordStreamBot {
     }
 
     async commandSemana(message) {
-        console.log('📅 Executando comando !semana');
+        console.log('📅 Executando comando !ssemana');
         
         const embed = new EmbedBuilder()
             .setTitle('📅 JOGOS DA SEMANA')
@@ -373,7 +373,7 @@ class DiscordStreamBot {
     }
 
     async commandConfig(message) {
-        console.log('⚙️ Executando comando !config');
+        console.log('⚙️ Executando comando !sconfig');
         
         const totalStreamers = Object.values(this.config.streamers).flat().length;
         const totalChampionships = Object.values(this.config.football_championships).flat().length;
@@ -397,7 +397,7 @@ class DiscordStreamBot {
     }
 
     async commandHelp(message) {
-        console.log('❓ Executando comando !help');
+        console.log('❓ Executando comando !shelp');
         
         const embed = new EmbedBuilder()
             .setTitle('🤖 COMANDOS DISPONÍVEIS')
@@ -406,9 +406,9 @@ class DiscordStreamBot {
             .setTimestamp()
             .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` })
             .addFields(
-                { name: '📺 Streams', value: '`!aovivo` - Ver streamers online agora', inline: false },
-                { name: '⚽ Futebol', value: '`!hoje` - Jogos de hoje\n`!amanha` - Jogos de amanhã\n`!semana` - Jogos da semana', inline: false },
-                { name: '⚙️ Sistema', value: '`!config` - Configurações do bot\n`!stats` - Estatísticas\n`!ping` - Testar bot', inline: false },
+                { name: '📺 Streams', value: '`!saovivo` - Ver streamers online agora', inline: false },
+                { name: '⚽ Futebol', value: '`!shoje` - Jogos de hoje\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana', inline: false },
+                { name: '⚙️ Sistema', value: '`!sconfig` - Configurações do bot\n`!sstats` - Estatísticas\n`!sping` - Testar bot', inline: false },
                 { name: '💡 Dica', value: 'Use os comandos neste canal para obter informações em tempo real!', inline: false }
             );
 
@@ -416,7 +416,7 @@ class DiscordStreamBot {
     }
 
     async commandPing(message) {
-        console.log('🏓 Executando comando !ping');
+        console.log('🏓 Executando comando !sping');
         
         const embed = new EmbedBuilder()
             .setTitle('🏓 PONG!')
@@ -434,7 +434,7 @@ class DiscordStreamBot {
     }
 
     async commandStats(message) {
-        console.log('📊 Executando comando !stats');
+        console.log('📊 Executando comando !sstats');
         
         const totalStreamers = Object.values(this.config.streamers).flat().length;
         const activeStreamsCount = this.activeStreams.size;
@@ -665,7 +665,7 @@ class DiscordStreamBot {
                     },
                     {
                         name: '🤖 Comando',
-                        value: 'Use `!aovivo` para ver todos online',
+                        value: 'Use `!saovivo` para ver todos online',
                         inline: true
                     }
                 ],
@@ -765,7 +765,7 @@ class DiscordStreamBot {
                 },
                 {
                     name: '🤖 Comandos Disponíveis',
-                    value: '!aovivo, !hoje, !amanha, !semana, !help',
+                    value: '!saovivo, !shoje, !samanha, !ssemana, !shelp',
                     inline: false
                 }
             ],
@@ -774,7 +774,7 @@ class DiscordStreamBot {
             }
         };
 
-        await this.sendWebhook(embed, `📊 **Relatório Diário** - Bot ativo em #${this.config.target_channel}! Use \`!help\` para ver comandos.`);
+        await this.sendWebhook(embed, `📊 **Relatório Diário** - Bot ativo em #${this.config.target_channel}! Use \`!shelp\` para ver comandos.`);
     }
 
     // ========== HELPERS ==========
