@@ -78,7 +78,7 @@ class SportsIntegration {
     getRealBrasileirao2025Data() {
         const today = new Date().toISOString().split('T')[0];
         
-        // Dados REAIS baseados no que você me mostrou - Rodada 11 do Brasileirão 2025
+        // Dados REAIS baseados no que você me mostrou - Rodada 11 COMPLETA do Brasileirão 2025
         const brasileiraoRodada11 = [
             {
                 partida_id: 'brasileirao_2025_r11_1',
@@ -95,7 +95,7 @@ class SportsIntegration {
             {
                 partida_id: 'brasileirao_2025_r11_2',
                 data_realizacao_iso: '2025-05-31T21:00:00-03:00',
-                time_mandante: { nome_popular: 'Vasco' },
+                time_mandante: { nome_popular: 'Vasco da Gama' },
                 time_visitante: { nome_popular: 'Bragantino' },
                 placar_mandante: 0,
                 placar_visitante: 0,
@@ -108,7 +108,7 @@ class SportsIntegration {
                 partida_id: 'brasileirao_2025_r11_3',
                 data_realizacao_iso: '2025-06-01T11:00:00-03:00',
                 time_mandante: { nome_popular: 'Mirassol' },
-                time_visitante: { nome_popular: 'Sport' },
+                time_visitante: { nome_popular: 'Sport Recife' },
                 placar_mandante: 0,
                 placar_visitante: 0,
                 status: 'agendado',
@@ -155,7 +155,7 @@ class SportsIntegration {
             {
                 partida_id: 'brasileirao_2025_r11_7',
                 data_realizacao_iso: '2025-06-01T18:30:00-03:00',
-                time_mandante: { nome_popular: 'Ceará' },
+                time_mandante: { nome_popular: 'Ceará SC' },
                 time_visitante: { nome_popular: 'Atlético-MG' },
                 placar_mandante: 0,
                 placar_visitante: 0,
@@ -168,7 +168,7 @@ class SportsIntegration {
                 partida_id: 'brasileirao_2025_r11_8',
                 data_realizacao_iso: '2025-06-01T18:30:00-03:00',
                 time_mandante: { nome_popular: 'Corinthians' },
-                time_visitante: { nome_popular: 'Vitória' },
+                time_visitante: { nome_popular: 'EC Vitória' },
                 placar_mandante: 0,
                 placar_visitante: 0,
                 status: 'agendado',
