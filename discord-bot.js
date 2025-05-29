@@ -816,7 +816,7 @@ class DiscordStreamBot {
             }
             content += `${streamer} está ao vivo!`;
 
-            await this.sendWebhook(embed, content);
+            await this.sendWebhook(embed, content, this.config.target_channel);
             
         } catch (error) {
             console.error(`❌ Erro ao notificar ${streamer}:`, error.message);
@@ -903,7 +903,7 @@ class DiscordStreamBot {
             }
         };
 
-        await this.sendWebhook(embed, `📊 **Relatório Diário** - Bot ativo em #${this.config.target_channel}! Use \`!shelp\` para ver comandos.`);
+        await this.sendWebhook(embed, `📊 **Relatório Diário** - Bot ativo em #${this.config.target_channel}! Use \`!shelp\` para ver comandos.`, this.config.target_channel);
     }
 
     async sendDailyGamesSummary() {
@@ -940,7 +940,7 @@ class DiscordStreamBot {
 
         try {
             // Enviar via webhook para o canal
-            await this.sendWebhook(embed, `🌅 **Bom dia, galera!** Confira os jogos de hoje! ⚽🏀🏓`);
+            await this.sendWebhook(embed, `🌅 **Bom dia, galera!** Confira os jogos de hoje! ⚽🏀🏓`, this.config.target_channel);
             console.log('✅ Resumo diário de jogos enviado às 8h');
         } catch (error) {
             console.error('❌ Erro ao enviar resumo diário:', error.message);
@@ -1020,8 +1020,27 @@ class DiscordStreamBot {
         return titles[Math.floor(Math.random() * titles.length)];
     }
 
-    async sendWebhook(embed, content = null) {
+    async sendWebhook(embed, content = null, targetChannel = null) {
         try {
+            // Se especificado um canal alvo, enviar via Discord.js
+            if (targetChannel) {
+                const channel = this.client.channels.cache.find(ch => 
+                    ch.name === targetChannel || 
+                    ch.name.includes('transmissões') || 
+                    ch.name.includes('transmissoes')
+                );
+                
+                if (channel) {
+                    const payload = { embeds: [embed] };
+                    if (content) payload.content = content;
+                    
+                    await channel.send(payload);
+                    console.log(`✅ Mensagem enviada para canal: ${channel.name}`);
+                    return;
+                }
+            }
+            
+            // Fallback para webhook original
             const payload = {
                 username: 'Smart Stream Bot',
                 avatar_url: 'https://cdn.discordapp.com/emojis/938415616628174849.png',
