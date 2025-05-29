@@ -302,6 +302,16 @@ class DiscordStreamBot {
                 case '!ssemana':
                     return await this.commandSemana(message);
                 
+                // Comandos de sistema
+                case '!shelp':
+                    return await this.commandHelp(message);
+                case '!sping':
+                    return await this.commandPing(message);
+                case '!sstats':
+                    return await this.commandStats(message);
+                case '!sconfig':
+                    return await this.commandConfig(message);
+                
                 // Comando especial para busca de times
                 default:
                     if (command.startsWith('!stime ')) {
@@ -584,61 +594,73 @@ class DiscordStreamBot {
     async commandHelp(message) {
         console.log('❓ Executando comando !shelp');
         
-        const embed = new EmbedBuilder()
-            .setTitle('🤖 COMANDOS DISPONÍVEIS - TheSportsDB Premium')
-            .setDescription('Lista completa de comandos do Smart Stream Bot com dados reais 2025!')
-            .setColor(0x7289da)
-            .setTimestamp()
-            .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel} | ✅ TheSportsDB Premium Ativo` })
-            .addFields(
-                { 
-                    name: '📺 STREAMS & TWITCH', 
-                    value: '`!saovivo` - Ver streamers online agora', 
-                    inline: false 
-                },
-                { 
-                    name: '🔴 LIVESCORES (TEMPO REAL)', 
-                    value: '`!slivescores` ou `!slive` - 🌟 **Todos os jogos ao vivo**\n`!slivefutebol` - ⚽ Só futebol ao vivo\n`!slivebasket` - 🏀 Só basquete ao vivo', 
-                    inline: false 
-                },
-                { 
-                    name: '📅 AGENDA & PRÓXIMOS JOGOS', 
-                    value: '`!sproximos` ou `!sagenda` - 📋 Próximos jogos principais\n`!ssemana` - 🗓️ Agenda completa da semana', 
-                    inline: false 
-                },
-                { 
-                    name: '⚽ FUTEBOL & ESPORTES HOJE', 
-                    value: '`!shoje` - 🌟 **Todos os esportes de hoje** (filtro brasileiro)\n`!sfutebol` - ⚽ **Só futebol** principais campeonatos', 
-                    inline: false 
-                },
-                { 
-                    name: '🔍 BUSCA DE TIMES', 
-                    value: '`!stime [nome]` - 🔎 Buscar informações de time\n📝 **Exemplos**: `!stime Arsenal`, `!stime Flamengo`, `!stime Lakers`', 
-                    inline: false 
-                },
-                { 
-                    name: '⚙️ SISTEMA & STATUS', 
-                    value: '`!sping` - 🏓 Testar bot\n`!sstats` - 📊 Estatísticas\n`!sconfig` - ⚙️ Configurações', 
-                    inline: false 
-                },
-                { 
-                    name: '🎯 FILTROS APLICADOS', 
-                    value: '⚽ **Futebol**: Só principais (❌ série B/C excluídas)\n🏀 **NBA**: Todos os jogos mostrados\n🎾 **Tênis**: Só brasileiros (João Fonseca ✅)\n🏆 **Campeonatos**: Champions, Premier, La Liga, etc.', 
-                    inline: false 
-                },
-                { 
-                    name: '💎 STATUS PREMIUM ATIVO', 
-                    value: '✅ **TheSportsDB Premium** - API Key: 959508\n📊 **Rate Limit**: 100 requests/minuto\n📅 **Dados**: 2025 reais + livescores em tempo real\n💰 **Custo**: €9/mês (muito mais barato que alternativas)\n🚀 **Recursos**: Livescores, agenda, busca de times, highlights', 
-                    inline: false 
-                },
-                { 
-                    name: '🌟 COMANDOS MAIS USADOS', 
-                    value: '**Dia a dia**: `!shoje`, `!slivescores`\n**Planejamento**: `!sproximos`, `!ssemana`\n**Pesquisa**: `!stime Arsenal`\n**Streams**: `!saovivo`', 
-                    inline: false 
-                }
-            );
+        try {
+            const embed = new EmbedBuilder()
+                .setTitle('🤖 COMANDOS DISPONÍVEIS - TheSportsDB Premium')
+                .setDescription('Lista completa de comandos do Smart Stream Bot com dados reais 2025!')
+                .setColor(0x7289da)
+                .setTimestamp()
+                .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel} | ✅ TheSportsDB Premium Ativo` })
+                .addFields(
+                    { 
+                        name: '📺 STREAMS & TWITCH', 
+                        value: '`!saovivo` - Ver streamers online agora', 
+                        inline: false 
+                    },
+                    { 
+                        name: '🔴 LIVESCORES (TEMPO REAL)', 
+                        value: '`!slivescores` ou `!slive` - 🌟 **Todos os jogos ao vivo**\n`!slivefutebol` - ⚽ Só futebol ao vivo\n`!slivebasket` - 🏀 Só basquete ao vivo', 
+                        inline: false 
+                    },
+                    { 
+                        name: '📅 AGENDA & PRÓXIMOS JOGOS', 
+                        value: '`!sproximos` ou `!sagenda` - 📋 Próximos jogos principais\n`!ssemana` - 🗓️ Agenda completa da semana', 
+                        inline: false 
+                    },
+                    { 
+                        name: '⚽ FUTEBOL & ESPORTES HOJE', 
+                        value: '`!shoje` - 🌟 **Todos os esportes de hoje** (filtro brasileiro)\n`!sfutebol` - ⚽ **Só futebol** principais campeonatos', 
+                        inline: false 
+                    },
+                    { 
+                        name: '🔍 BUSCA DE TIMES', 
+                        value: '`!stime [nome]` - 🔎 Buscar informações de time\n📝 **Exemplos**: `!stime Arsenal`, `!stime Flamengo`, `!stime Lakers`', 
+                        inline: false 
+                    },
+                    { 
+                        name: '⚙️ SISTEMA & STATUS', 
+                        value: '`!sping` - 🏓 Testar bot\n`!sstats` - 📊 Estatísticas\n`!sconfig` - ⚙️ Configurações', 
+                        inline: false 
+                    },
+                    { 
+                        name: '🎯 FILTROS APLICADOS', 
+                        value: '⚽ **Futebol**: Só principais (❌ série B/C excluídas)\n🏀 **NBA**: Todos os jogos mostrados\n🎾 **Tênis**: Só brasileiros (João Fonseca ✅)\n🏆 **Campeonatos**: Champions, Premier, La Liga, etc.', 
+                        inline: false 
+                    },
+                    { 
+                        name: '💎 STATUS PREMIUM ATIVO', 
+                        value: '✅ **TheSportsDB Premium** - API Key: 959508\n📊 **Rate Limit**: 100 requests/minuto\n📅 **Dados**: 2025 reais + livescores em tempo real\n💰 **Custo**: €9/mês (muito mais barato que alternativas)\n🚀 **Recursos**: Livescores, agenda, busca de times, highlights', 
+                        inline: false 
+                    },
+                    { 
+                        name: '🌟 COMANDOS MAIS USADOS', 
+                        value: '**Dia a dia**: `!shoje`, `!slivescores`\n**Planejamento**: `!sproximos`, `!ssemana`\n**Pesquisa**: `!stime Arsenal`\n**Streams**: `!saovivo`', 
+                        inline: false 
+                    }
+                );
 
-        await message.reply({ embeds: [embed] });
+            console.log('✅ Embed do !shelp criado com sucesso');
+            await message.reply({ embeds: [embed] });
+            console.log('✅ !shelp enviado com sucesso');
+
+        } catch (error) {
+            console.error('❌ Erro no comando !shelp:', error);
+            try {
+                await message.reply('❌ Erro ao carregar lista de comandos. Use `!sping` para testar o bot.');
+            } catch (replyError) {
+                console.error('❌ Erro crítico ao responder !shelp:', replyError);
+            }
+        }
     }
 
     async commandPing(message) {
