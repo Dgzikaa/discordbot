@@ -2,16 +2,10 @@
   "name": "smart-stream-bot-discord",
   "version": "2.0.0",
   "description": "Smart Stream Bot - Monitora streamers e jogos automaticamente no Discord",
-  "main": "smart-start.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node smart-start.js start",
-    "dev": "nodemon smart-start.js start",
-    "webhook": "node webhook-bot.js",
-    "smart": "node smart-start.js",
-    "test-webhook": "node test-webhook.js",
-    "test": "node smart-start.js test",
-    "config": "node smart-start.js show-config",
-    "help": "node smart-start.js help"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -42,6 +36,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SEU_USER/smart-stream-bot.git"
+    "url": "git+https://github.com/Dgzikaa/discordbot.git"
   }
 }
