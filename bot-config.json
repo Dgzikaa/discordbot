@@ -1,4 +1,5 @@
 {
+  "target_channel": "transmissões",
   "streamers": {
     "cs2_br": [
       "gaules",
@@ -13,30 +14,65 @@
     ],
     "futebol": [
       "casimito",
-      "loud_coringa"
+      "loud_coringa",
+      "cosiq",
+      "warlillo",
+      "watos_",
+      "pagodedojorgin",
+      "dupladedoix",
+      "liraGOAT"
     ],
     "variety": [
       "cellbit",
       "bauky"
     ]
   },
-  "football_leagues": [
-    "brasileirao",
-    "premier_league",
-    "champions_league",
-    "copa_brasil"
-  ],
-  "cs2_tournaments": [
-    "major",
-    "esl_pro_league",
-    "blast_premier",
-    "iem"
-  ],
+  "football_championships": {
+    "nacionais": [
+      "libertadores",
+      "brasileirao",
+      "estaduais"
+    ],
+    "internacionais": [
+      "mundial",
+      "champions",
+      "ingles",
+      "frances",
+      "italiano"
+    ],
+    "copas": [
+      "copa_do_mundo",
+      "copa_brasil",
+      "copa_america"
+    ]
+  },
+  "other_sports": {
+    "tenis_mesa": [
+      "hugo_calderano"
+    ],
+    "tenis_brasileiro": [
+      "bia_haddad",
+      "thiago_monteiro"
+    ],
+    "basquete": [
+      "nba"
+    ],
+    "eventos_especiais": [
+      "copa_do_mundo",
+      "olimpiadas"
+    ]
+  },
   "notifications": {
     "ping_everyone": true,
     "min_viewers": 1000,
     "cooldown_minutes": 30,
-    "include_thumbnails": true
+    "include_thumbnails": true,
+    "mention_channel": true
+  },
+  "commands": {
+    "enabled": true,
+    "cooldown_seconds": 15,
+    "admin_only": false
   },
   "active_hours": {
     "start": 8,
