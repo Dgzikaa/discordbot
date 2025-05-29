@@ -52,11 +52,28 @@ class DiscordStreamBot {
             // Ignorar mensagens do próprio bot
             if (message.author.bot) return;
             
-            // Verificar se é no canal correto
-            if (message.channel.name !== this.channelName) return;
+            // Debug: mostrar informações do canal
+            console.log(`📝 Mensagem recebida no canal: "${message.channel.name}" (esperado: "${this.channelName}")`);
+            console.log(`📝 Conteúdo: "${message.content}"`);
+            
+            // Verificar se é no canal correto (aceitar "transmissões" e "transmissoes")
+            const channelName = message.channel.name;
+            const isCorrectChannel = channelName === this.channelName || 
+                                   channelName === 'transmissões' || 
+                                   channelName === 'transmissoes';
+            
+            if (!isCorrectChannel) {
+                console.log(`⚠️ Canal incorreto: "${channelName}", ignorando mensagem`);
+                return;
+            }
             
             // Verificar se é um comando que começa com !s
-            if (!message.content.startsWith('!s')) return;
+            if (!message.content.startsWith('!s')) {
+                console.log(`⚠️ Não é um comando !s, ignorando: "${message.content}"`);
+                return;
+            }
+            
+            console.log(`✅ Processando comando: "${message.content}" no canal: "${channelName}"`);
             
             // Processar comando
             await this.processCommand(message);
