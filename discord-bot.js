@@ -60,7 +60,11 @@ class DiscordStreamBot {
             const channelName = message.channel.name;
             const isCorrectChannel = channelName === this.channelName || 
                                    channelName === 'transmissões' || 
-                                   channelName === 'transmissoes';
+                                   channelName === 'transmissoes' ||
+                                   channelName === '📺transmissões' ||
+                                   channelName === '📺transmissoes' ||
+                                   channelName.includes('transmissões') ||
+                                   channelName.includes('transmissoes');
             
             if (!isCorrectChannel) {
                 console.log(`⚠️ Canal incorreto: "${channelName}", ignorando mensagem`);
