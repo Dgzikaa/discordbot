@@ -193,21 +193,53 @@ class DiscordStreamBot {
         console.log('🌍 Internacionais:', this.config.football_championships.internacionais.join(', '));
         console.log('🏆 Copas:', this.config.football_championships.copas.join(', '));
         
-        console.log('\n🏅 OUTROS ESPORTES:');
-        console.log('🏓 Tênis de Mesa:', this.config.other_sports.tenis_mesa.join(', '));
-        console.log('🎾 Tênis Brasileiro:', this.config.other_sports.tenis_brasileiro.join(', '));
-        console.log('🏀 Basquete:', this.config.other_sports.basquete.join(', '));
-        console.log('🌟 Eventos Especiais:', this.config.other_sports.eventos_especiais.join(', '));
+        console.log('\n🏅 OUTROS ESPORTES (API-SPORTS.IO):');
+        console.log('🏀 Basquete: NBA, Euroleague, NBB');
+        console.log('🎾 Tênis: ATP, WTA, Grand Slams');
+        console.log('🏐 Volleyball: FIVB, Superliga BR');
+        console.log('🏒 Hockey: NHL');
+        console.log('⚾ Baseball: MLB');
+        console.log('🏈 Football Americano: NFL');
+        
+        console.log('\n🔑 APIS CONFIGURADAS:');
+        console.log('⚽ API Futebol:', this.config.apis.api_futebol_token ? '✅ Configurada' : '❌ Não configurada');
+        console.log('🏀 API Sports:', this.config.apis.api_sports_token ? '✅ Configurada' : '❌ Não configurada');
         console.log('');
     }
 
     // Mostrar comandos disponíveis
     showAvailableCommands() {
         console.log('🤖 COMANDOS DISPONÍVEIS:');
+        console.log('📺 STREAMS:');
         console.log('!saovivo - Verificar streamers online');
+        console.log('');
+        console.log('⚽ FUTEBOL BRASILEIRO:');
         console.log('!shoje - Jogos de hoje');
         console.log('!samanha - Jogos de amanhã');
         console.log('!ssemana - Jogos da semana');
+        console.log('');
+        console.log('🏀 BASQUETE:');
+        console.log('!snba - Jogos da NBA');
+        console.log('!snbb - Basquete brasileiro');
+        console.log('');
+        console.log('🎾 TÊNIS:');
+        console.log('!stenis - Torneios de tênis');
+        console.log('!satp - Ranking ATP');
+        console.log('!swta - Ranking WTA');
+        console.log('');
+        console.log('🏐 VOLLEYBALL:');
+        console.log('!svolley - Jogos de volleyball');
+        console.log('');
+        console.log('🏒 HOCKEY:');
+        console.log('!snhl - Jogos da NHL');
+        console.log('');
+        console.log('⚾ BASEBALL:');
+        console.log('!smlb - Jogos da MLB');
+        console.log('');
+        console.log('🏈 FOOTBALL AMERICANO:');
+        console.log('!snfl - Jogos da NFL');
+        console.log('');
+        console.log('⚙️ SISTEMA:');
         console.log('!sconfig - Configurações do bot');
         console.log('!shelp - Lista de comandos');
         console.log('!sping - Testar bot');
