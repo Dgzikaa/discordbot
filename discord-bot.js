@@ -3,7 +3,7 @@ const axios = require('axios');
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
-const SportsIntegration = require('./sports-integration.js');
+const SportsIntegrationTheSportsDBCorreto = require('./sports-integration-thesportsdb-correto.js');
 
 class DiscordStreamBot {
     constructor(token, webhookUrl, channelName = 'transmissões') {
@@ -28,7 +28,7 @@ class DiscordStreamBot {
         this.loadConfig();
         
         // Inicializar integração de esportes
-        this.sportsIntegration = new SportsIntegration(this.config);
+        this.sportsIntegration = new SportsIntegrationTheSportsDBCorreto(this.config);
         
         // Configurar eventos do Discord
         this.setupDiscordEvents();
@@ -1514,62 +1514,70 @@ class DiscordStreamBot {
 
     // COMANDO: !sproximos ou !sagenda - PRÓXIMOS JOGOS
     async commandProximos(message) {
-        console.log('📅 Executando comando !sproximos - PRÓXIMOS JOGOS');
+        console.log('📅 Executando comando !sproximos - PRÓXIMOS JOGOS IMPORTANTES');
         
-        const loadingMsg = await message.reply('📅 Buscando próximos jogos...');
+        const loadingMsg = await message.reply('🎯 Buscando jogos IMPORTANTES...');
         
         try {
-            const proximosJogos = await this.sportsIntegration.getWeeklySchedule();
+            // Usar o novo método com filtros inteligentes
+            const sportsData = await this.sportsIntegration.getAllImportantSportsToday();
             
             const embed = new EmbedBuilder()
-                .setTitle('📅 PRÓXIMOS JOGOS DA SEMANA')
-                .setDescription('🗓️ Agenda dos principais campeonatos')
-                .setColor(0x4169e1)
+                .setTitle('🎯 JOGOS IMPORTANTES HOJE')
+                .setDescription('🌟 Apenas os jogos que realmente importam!')
+                .setColor(0xFFD700) // Cor dourada para "importantes"
                 .setTimestamp()
-                .setFooter({ text: `Smart Stream Bot - Agenda da semana` });
+                .setFooter({ text: `TheSportsDB Premium - Filtros Inteligentes Ativos` });
 
             let hasAnyGames = false;
+            let totalImportantGames = 0;
 
-            // Brasileirão - MOSTRAR TODOS OS 15 JOGOS
-            if (proximosJogos.brasileirao && proximosJogos.brasileirao.length > 0) {
+            // BRASILEIRÃO (sempre mostrar - dados reais)
+            if (sportsData.footballBrazil && sportsData.footballBrazil.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.brasileirao.slice(0, 15); // Máximo 15 jogos
-                const jogosText = jogos.map(jogo => 
-                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                totalImportantGames += sportsData.footballBrazil.length;
+                
+                const jogosText = sportsData.footballBrazil.map(jogo => 
+                    `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue} | ${jogo.round}`
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: `⚽ Brasileirão - Próximos Jogos (${jogos.length})`,
+                    name: `🇧🇷 BRASILEIRÃO SÉRIE A (${sportsData.footballBrazil.length} jogos)`,
                     value: jogosText,
                     inline: false
                 });
             }
 
-            // Campeonatos Internacionais - MOSTRAR TODOS
-            if (proximosJogos.internacional && proximosJogos.internacional.length > 0) {
+            // FUTEBOL INTERNACIONAL IMPORTANTE
+            if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.internacional; // TODOS os jogos
-                const jogosText = jogos.map(jogo => 
-                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
+                totalImportantGames += sportsData.footballInternational.length;
+                
+                // Mostrar apenas os 10 mais importantes (ordenados por prioridade)
+                const topGames = sportsData.footballInternational.slice(0, 10);
+                
+                const jogosText = topGames.map(jogo => 
+                    `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league} | 🔥 ${jogo.priority}`
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: `🏆 Campeonatos Internacionais (${jogos.length})`,
+                    name: `⚽ FUTEBOL INTERNACIONAL (${topGames.length}/${sportsData.footballInternational.length} importantes)`,
                     value: jogosText,
                     inline: false
                 });
             }
 
-            // NBA - MOSTRAR TODOS
-            if (proximosJogos.nba && proximosJogos.nba.length > 0) {
+            // NBA IMPORTANTE
+            if (sportsData.nba && sportsData.nba.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.nba; // TODOS os jogos
-                const jogosText = jogos.map(jogo => 
-                    `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
+                totalImportantGames += sportsData.nba.length;
+                
+                const jogosText = sportsData.nba.map(jogo => 
+                    `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}`
                 ).join('\n\n');
                 
                 embed.addFields({
-                    name: `🏀 NBA - Próximos Jogos (${jogos.length})`,
+                    name: `🏀 NBA (${sportsData.nba.length} jogos)`,
                     value: jogosText,
                     inline: false
                 });
@@ -1577,8 +1585,15 @@ class DiscordStreamBot {
 
             if (!hasAnyGames) {
                 embed.addFields({
-                    name: '⚠️ Nenhum jogo agendado',
-                    value: 'Pode ser entre temporadas. Use `!slivescores` para jogos ao vivo.',
+                    name: '⚠️ Nenhum jogo importante hoje',
+                    value: 'Nenhum evento relevante encontrado para hoje.\n💡 Pode ser dia de descanso entre rodadas.',
+                    inline: false
+                });
+            } else {
+                // Adicionar resumo dos filtros
+                embed.addFields({
+                    name: '🎯 Resumo dos Filtros Inteligentes',
+                    value: `✅ **${totalImportantGames}** jogos importantes selecionados\n🔍 Filtros: Ligas principais, times populares, jogos ao vivo\n🚫 **SEM dados fictícios** - apenas dados reais!`,
                     inline: false
                 });
             }
@@ -1586,8 +1601,8 @@ class DiscordStreamBot {
             await loadingMsg.edit({ content: '', embeds: [embed] });
 
         } catch (error) {
-            console.error('❌ Erro no comando proximos:', error);
-            await loadingMsg.edit('❌ Erro ao buscar próximos jogos. Tente novamente.');
+            console.error('❌ Erro no comando sproximos:', error);
+            await loadingMsg.edit('❌ Erro ao buscar jogos importantes. Tente novamente.');
         }
     }
 
