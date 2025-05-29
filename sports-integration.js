@@ -529,7 +529,7 @@ class SportsIntegration {
     // ========== PRÓXIMOS JOGOS (PARA AGENDA SEMANAL) ==========
 
     async getUpcomingNBA() {
-        console.log('🏀 Buscando próximos jogos da NBA (APENAS DADOS REAIS)...');
+        console.log('🏀 Buscando TODOS os próximos jogos da NBA (SEM LIMITE)...');
         
         // Buscar próximos jogos da NBA nos próximos 7 dias
         const results = [];
@@ -551,7 +551,7 @@ class SportsIntegration {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.response && data.response.length > 0) {
-                        const games = data.response.slice(0, 5).map(fixture => ({ // Máximo 5 por dia
+                        const games = data.response.map(fixture => ({ // TODOS os jogos do dia
                             time: new Date(fixture.fixture.date).toLocaleTimeString('pt-BR', { 
                                 hour: '2-digit', 
                                 minute: '2-digit' 
@@ -574,8 +574,8 @@ class SportsIntegration {
         }
 
         if (results.length > 0) {
-            console.log(`✅ Encontrados ${results.length} próximos jogos da NBA!`);
-            return results.slice(0, 10); // Máximo 10 jogos totais
+            console.log(`✅ Encontrados ${results.length} próximos jogos da NBA (SEM LIMITE)!`);
+            return results; // TODOS os jogos sem limite
         }
 
         console.log('⚠️ Nenhum próximo jogo da NBA encontrado');
@@ -583,7 +583,7 @@ class SportsIntegration {
     }
 
     async getUpcomingInternationalFootball() {
-        console.log('🏆 Buscando próximos jogos internacionais (APENAS DADOS REAIS)...');
+        console.log('🏆 Buscando TODOS os próximos jogos internacionais (SEM LIMITE)...');
         
         const championships = [
             { league: 39, name: 'Premier League' },
@@ -600,7 +600,7 @@ class SportsIntegration {
             date.setDate(today.getDate() + i);
             const dateStr = date.toISOString().split('T')[0];
             
-            for (const championship of championships.slice(0, 2)) { // Só 2 ligas principais
+            for (const championship of championships) { // TODAS as ligas
                 try {
                     const response = await fetch(`https://api.api-sports.io/v1/fixtures?league=${championship.league}&season=2024&date=${dateStr}`, {
                         headers: {
@@ -612,7 +612,7 @@ class SportsIntegration {
                     if (response.ok) {
                         const data = await response.json();
                         if (data.response && data.response.length > 0) {
-                            const games = data.response.slice(0, 3).map(fixture => ({ // Máximo 3 por liga por dia
+                            const games = data.response.map(fixture => ({ // TODOS os jogos da liga
                                 time: new Date(fixture.fixture.date).toLocaleTimeString('pt-BR', { 
                                     hour: '2-digit', 
                                     minute: '2-digit' 
@@ -636,8 +636,8 @@ class SportsIntegration {
         }
 
         if (results.length > 0) {
-            console.log(`✅ Encontrados ${results.length} próximos jogos internacionais!`);
-            return results.slice(0, 8); // Máximo 8 jogos internacionais
+            console.log(`✅ Encontrados ${results.length} próximos jogos internacionais (SEM LIMITE)!`);
+            return results; // TODOS os jogos sem limite
         }
 
         console.log('⚠️ Nenhum próximo jogo internacional encontrado');

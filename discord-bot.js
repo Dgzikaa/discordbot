@@ -575,40 +575,40 @@ class DiscordStreamBot {
 
                 // Detalhes por campeonato (limitado para não sobrecarregar)
                 if (agenda.brasileirao && agenda.brasileirao.length > 0) {
-                    const primeirosJogos = agenda.brasileirao.slice(0, 3);
+                    const primeirosJogos = agenda.brasileirao.slice(0, 5); // Mostra 5 como preview
                     const jogosText = primeirosJogos.map(jogo => 
                         `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                     ).join('\n\n');
                     
                     embed.addFields({
                         name: `⚽ Brasileirão (${agenda.brasileirao.length} jogos)`,
-                        value: jogosText + (agenda.brasileirao.length > 3 ? `\n\n... e mais ${agenda.brasileirao.length - 3} jogos` : ''),
+                        value: jogosText + (agenda.brasileirao.length > 5 ? `\n\n... e mais ${agenda.brasileirao.length - 5} jogos` : ''),
                         inline: true
                     });
                 }
 
                 if (agenda.internacional && agenda.internacional.length > 0) {
-                    const primeirosJogos = agenda.internacional.slice(0, 3);
+                    const primeirosJogos = agenda.internacional.slice(0, 5); // Mostra 5 como preview
                     const jogosText = primeirosJogos.map(jogo => 
                         `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
                     ).join('\n\n');
                     
                     embed.addFields({
                         name: `🏆 Internacional (${agenda.internacional.length} jogos)`,
-                        value: jogosText + (agenda.internacional.length > 3 ? `\n\n... e mais ${agenda.internacional.length - 3} jogos` : ''),
+                        value: jogosText + (agenda.internacional.length > 5 ? `\n\n... e mais ${agenda.internacional.length - 5} jogos` : ''),
                         inline: true
                     });
                 }
 
                 if (agenda.nba && agenda.nba.length > 0) {
-                    const primeirosJogos = agenda.nba.slice(0, 3);
+                    const primeirosJogos = agenda.nba.slice(0, 5); // Mostra 5 como preview
                     const jogosText = primeirosJogos.map(jogo => 
                         `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                     ).join('\n\n');
                     
                     embed.addFields({
                         name: `🏀 NBA (${agenda.nba.length} jogos)`,
-                        value: jogosText + (agenda.nba.length > 3 ? `\n\n... e mais ${agenda.nba.length - 3} jogos` : ''),
+                        value: jogosText + (agenda.nba.length > 5 ? `\n\n... e mais ${agenda.nba.length - 5} jogos` : ''),
                         inline: true
                     });
                 }
@@ -1545,10 +1545,10 @@ class DiscordStreamBot {
                 });
             }
 
-            // Campeonatos Internacionais
+            // Campeonatos Internacionais - MOSTRAR TODOS
             if (proximosJogos.internacional && proximosJogos.internacional.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.internacional.slice(0, 5);
+                const jogos = proximosJogos.internacional; // TODOS os jogos
                 const jogosText = jogos.map(jogo => 
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}** (${jogo.league})`
                 ).join('\n\n');
@@ -1560,10 +1560,10 @@ class DiscordStreamBot {
                 });
             }
 
-            // NBA
+            // NBA - MOSTRAR TODOS
             if (proximosJogos.nba && proximosJogos.nba.length > 0) {
                 hasAnyGames = true;
-                const jogos = proximosJogos.nba.slice(0, 5);
+                const jogos = proximosJogos.nba; // TODOS os jogos
                 const jogosText = jogos.map(jogo => 
                     `📅 ${jogo.date} ${jogo.time}\n**${jogo.homeTeam} x ${jogo.awayTeam}**`
                 ).join('\n\n');
