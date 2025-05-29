@@ -1522,83 +1522,165 @@ class DiscordStreamBot {
             // Usar o novo método com filtros inteligentes
             const sportsData = await this.sportsIntegration.getAllImportantSportsToday();
             
-            const embed = new EmbedBuilder()
-                .setTitle('🎯 JOGOS IMPORTANTES HOJE')
-                .setDescription('🌟 Apenas os jogos que realmente importam!')
-                .setColor(0xFFD700) // Cor dourada para "importantes"
-                .setTimestamp()
-                .setFooter({ text: `TheSportsDB Premium - Filtros Inteligentes Ativos` });
-
-            let hasAnyGames = false;
             let totalImportantGames = 0;
+            let messagesSent = 0;
 
-            // BRASILEIRÃO (sempre mostrar - dados reais)
-            if (sportsData.footballBrazil && sportsData.footballBrazil.length > 0) {
-                hasAnyGames = true;
-                totalImportantGames += sportsData.footballBrazil.length;
+            // ========== MENSAGEM 1: FUTEBOL ==========
+            if ((sportsData.footballBrazil && sportsData.footballBrazil.length > 0) || 
+                (sportsData.footballInternational && sportsData.footballInternational.length > 0)) {
                 
-                const jogosText = sportsData.footballBrazil.map(jogo => 
-                    `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue} | ${jogo.round}`
-                ).join('\n\n');
-                
-                embed.addFields({
-                    name: `🇧🇷 BRASILEIRÃO SÉRIE A (${sportsData.footballBrazil.length} jogos)`,
-                    value: jogosText,
-                    inline: false
-                });
+                const footballEmbed = new EmbedBuilder()
+                    .setTitle('⚽ FUTEBOL HOJE')
+                    .setDescription('🇧🇷 Brasileirão + 🏆 Principais Campeonatos')
+                    .setColor(0x228B22) // Verde futebol
+                    .setTimestamp()
+                    .setFooter({ text: `TheSportsDB Premium - Dados Reais` });
+
+                // BRASILEIRÃO
+                if (sportsData.footballBrazil && sportsData.footballBrazil.length > 0) {
+                    totalImportantGames += sportsData.footballBrazil.length;
+                    
+                    const jogosText = sportsData.footballBrazil.map(jogo => 
+                        `⏰ **${jogo.time}** - ${jogo.status}\n🏟️ **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n📺 **Globo, SporTV**`
+                    ).join('\n\n');
+                    
+                    footballEmbed.addFields({
+                        name: `🇧🇷 BRASILEIRÃO SÉRIE A (${sportsData.footballBrazil.length} jogos)`,
+                        value: jogosText,
+                        inline: false
+                    });
+                }
+
+                // FUTEBOL INTERNACIONAL
+                if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
+                    totalImportantGames += sportsData.footballInternational.length;
+                    
+                    // Mostrar TODOS os jogos importantes (sem limite aqui)
+                    const jogosText = sportsData.footballInternational.map(jogo => {
+                        // Determinar canal baseado na liga
+                        let canal = '📺 ESPN';
+                        if (jogo.league.includes('Champions')) canal = '📺 **TNT Sports, HBO Max**';
+                        else if (jogo.league.includes('Premier')) canal = '📺 **ESPN, Star+**';
+                        else if (jogo.league.includes('Libertadores')) canal = '📺 **Paramount+**';
+                        else if (jogo.league.includes('La Liga')) canal = '📺 **ESPN**';
+                        
+                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
+                    }).join('\n\n');
+                    
+                    footballEmbed.addFields({
+                        name: `🏆 FUTEBOL INTERNACIONAL (${sportsData.footballInternational.length} jogos)`,
+                        value: jogosText,
+                        inline: false
+                    });
+                }
+
+                await message.channel.send({ embeds: [footballEmbed] });
+                messagesSent++;
             }
 
-            // FUTEBOL INTERNACIONAL IMPORTANTE
-            if (sportsData.footballInternational && sportsData.footballInternational.length > 0) {
-                hasAnyGames = true;
-                totalImportantGames += sportsData.footballInternational.length;
-                
-                // Mostrar apenas os 10 mais importantes (ordenados por prioridade)
-                const topGames = sportsData.footballInternational.slice(0, 10);
-                
-                const jogosText = topGames.map(jogo => 
-                    `⏰ **${jogo.time}** - ${jogo.status}\n🏆 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league} | 🔥 ${jogo.priority}`
-                ).join('\n\n');
-                
-                embed.addFields({
-                    name: `⚽ FUTEBOL INTERNACIONAL (${topGames.length}/${sportsData.footballInternational.length} importantes)`,
-                    value: jogosText,
-                    inline: false
-                });
-            }
-
-            // NBA IMPORTANTE
+            // ========== MENSAGEM 2: BASQUETE ==========
             if (sportsData.nba && sportsData.nba.length > 0) {
-                hasAnyGames = true;
                 totalImportantGames += sportsData.nba.length;
                 
-                const jogosText = sportsData.nba.map(jogo => 
-                    `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}`
-                ).join('\n\n');
-                
-                embed.addFields({
-                    name: `🏀 NBA (${sportsData.nba.length} jogos)`,
-                    value: jogosText,
-                    inline: false
-                });
+                const basketEmbed = new EmbedBuilder()
+                    .setTitle('🏀 BASQUETE HOJE')
+                    .setDescription('🇺🇸 NBA + 🌍 Ligas Internacionais')
+                    .setColor(0xFF8C00) // Laranja basquete
+                    .setTimestamp()
+                    .setFooter({ text: `TheSportsDB Premium - TODOS os jogos` });
+
+                // Separar NBA real de outras ligas
+                const nbaGames = sportsData.nba.filter(jogo => 
+                    jogo.league.includes('NBA') || jogo.league.includes('WNBA')
+                );
+                const otherBasketball = sportsData.nba.filter(jogo => 
+                    !jogo.league.includes('NBA') && !jogo.league.includes('WNBA')
+                );
+
+                // NBA PRINCIPAL
+                if (nbaGames.length > 0) {
+                    const nbaText = nbaGames.map(jogo => {
+                        const canal = jogo.league.includes('WNBA') ? '📺 **ESPN, Amazon Prime**' : '📺 **ESPN, NBA League Pass**';
+                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📍 ${jogo.venue}\n${canal}`;
+                    }).join('\n\n');
+                    
+                    basketEmbed.addFields({
+                        name: `🇺🇸 NBA + WNBA (${nbaGames.length} jogos)`,
+                        value: nbaText,
+                        inline: false
+                    });
+                }
+
+                // OUTRAS LIGAS DE BASQUETE
+                if (otherBasketball.length > 0) {
+                    const otherText = otherBasketball.slice(0, 15).map(jogo => {
+                        let canal = '📺 ESPN';
+                        if (jogo.league.includes('EuroLeague')) canal = '📺 **ESPN**';
+                        else if (jogo.league.includes('Spanish')) canal = '📺 **ESPN**';
+                        else if (jogo.league.includes('Turkish')) canal = '📺 **ESPN**';
+                        
+                        return `⏰ **${jogo.time}** - ${jogo.status}\n🏀 **${jogo.homeTeam} x ${jogo.awayTeam}**\n📊 ${jogo.league}\n${canal}`;
+                    }).join('\n\n');
+                    
+                    const moreText = otherBasketball.length > 15 ? `\n\n💡 **+${otherBasketball.length - 15} outros jogos**` : '';
+                    
+                    basketEmbed.addFields({
+                        name: `🌍 BASQUETE INTERNACIONAL (${otherBasketball.length} jogos)`,
+                        value: otherText + moreText,
+                        inline: false
+                    });
+                }
+
+                await message.channel.send({ embeds: [basketEmbed] });
+                messagesSent++;
             }
 
-            if (!hasAnyGames) {
-                embed.addFields({
-                    name: '⚠️ Nenhum jogo importante hoje',
-                    value: 'Nenhum evento relevante encontrado para hoje.\n💡 Pode ser dia de descanso entre rodadas.',
+            // ========== MENSAGEM FINAL: RESUMO ==========
+            if (messagesSent > 0) {
+                const summaryEmbed = new EmbedBuilder()
+                    .setTitle('🎯 RESUMO DOS JOGOS IMPORTANTES')
+                    .setDescription('📊 Filtros inteligentes aplicados com sucesso!')
+                    .setColor(0xFFD700) // Dourado
+                    .setTimestamp()
+                    .setFooter({ text: `Smart Stream Bot - Dados reais via TheSportsDB Premium` });
+
+                summaryEmbed.addFields({
+                    name: '📊 Total de Jogos Selecionados',
+                    value: `✅ **${totalImportantGames}** jogos importantes encontrados\n🇧🇷 Brasileirão: ${sportsData.footballBrazil?.length || 0}\n⚽ Futebol Internacional: ${sportsData.footballInternational?.length || 0}\n🏀 Basquete: ${sportsData.nba?.length || 0}`,
+                    inline: true
+                });
+
+                summaryEmbed.addFields({
+                    name: '🎯 Filtros Aplicados',
+                    value: '✅ Só principais campeonatos\n✅ Times populares priorizados\n✅ Jogos ao vivo destacados\n❌ SEM dados fictícios',
+                    inline: true
+                });
+
+                summaryEmbed.addFields({
+                    name: '💡 Comandos Relacionados',
+                    value: '`!slivescores` - Jogos ao vivo\n`!sfutebol` - Só futebol\n`!slivebasket` - Só basquete\n`!stime Arsenal` - Buscar time',
                     inline: false
                 });
+
+                await message.channel.send({ embeds: [summaryEmbed] });
+                await loadingMsg.delete();
             } else {
-                // Adicionar resumo dos filtros
-                embed.addFields({
-                    name: '🎯 Resumo dos Filtros Inteligentes',
-                    value: `✅ **${totalImportantGames}** jogos importantes selecionados\n🔍 Filtros: Ligas principais, times populares, jogos ao vivo\n🚫 **SEM dados fictícios** - apenas dados reais!`,
+                // Nenhum jogo importante encontrado
+                const noGamesEmbed = new EmbedBuilder()
+                    .setTitle('⚠️ NENHUM JOGO IMPORTANTE HOJE')
+                    .setDescription('Não há eventos relevantes programados para hoje')
+                    .setColor(0x808080) // Cinza
+                    .setTimestamp()
+                    .setFooter({ text: `TheSportsDB Premium - Dados reais` });
+
+                noGamesEmbed.addFields({
+                    name: '😴 Dia Tranquilo',
+                    value: 'Pode ser período entre temporadas ou dia de descanso.\n\n💡 **Tente outros comandos:**\n`!slivescores` - Verificar jogos ao vivo\n`!ssemana` - Agenda da semana\n`!sfutebol` - Buscar futebol específico',
                     inline: false
                 });
-            }
 
-            await loadingMsg.edit({ content: '', embeds: [embed] });
+                await loadingMsg.edit({ content: '', embeds: [noGamesEmbed] });
+            }
 
         } catch (error) {
             console.error('❌ Erro no comando sproximos:', error);
