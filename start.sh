@@ -10,7 +10,6 @@ echo "PORT: $PORT"
 echo "NODE_ENV: $NODE_ENV"
 echo "Files in /app:"
 ls -la /app/
-echo "=== Starting Discord Bot with HTTP server on port $PORT ==="
 
-# Executar apenas o Node.js por enquanto para testar healthcheck
-cd /app && node index.js
+echo "=== Starting simple test server ==="
+cd /app && node test.js
