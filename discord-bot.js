@@ -3,6 +3,7 @@ const axios = require('axios');
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
+const SportsIntegration = require('./sports-integration.js');
 
 class DiscordStreamBot {
     constructor(token, webhookUrl, channelName = 'transmissões') {
@@ -25,6 +26,9 @@ class DiscordStreamBot {
         
         // Carregar configurações salvas
         this.loadConfig();
+        
+        // Inicializar integração de esportes
+        this.sportsIntegration = new SportsIntegration(this.config);
         
         // Configurar eventos do Discord
         this.setupDiscordEvents();
@@ -85,6 +89,12 @@ class DiscordStreamBot {
             // Canal alvo
             target_channel: this.channelName || 'transmissões',
             
+            // APIs Configuration
+            apis: {
+                api_futebol_token: process.env.API_FUTEBOL_TOKEN || null,
+                api_sports_token: process.env.API_SPORTS_TOKEN || null
+            },
+            
             // Streamers por categoria
             streamers: {
                 cs2_br: ['gaules', 'fallen', 'coldzera', 'taco'],
@@ -93,19 +103,44 @@ class DiscordStreamBot {
                 variety: ['cellbit', 'bauky']
             },
             
-            // Campeonatos de futebol específicos
+            // Campeonatos de futebol específicos (API Futebol)
             football_championships: {
-                nacionais: ['libertadores', 'brasileirao', 'estaduais'],
-                internacionais: ['mundial', 'champions', 'ingles', 'frances', 'italiano'],
-                copas: ['copa_do_mundo', 'copa_brasil', 'copa_america']
+                nacionais: ['brasileirao', 'copa_brasil', 'estaduais'],
+                internacionais: ['libertadores', 'sulamericana'],
+                copas: ['copa_do_mundo', 'copa_america', 'copa_nordeste']
             },
             
-            // Outros esportes
+            // Outros esportes (API-Sports.io)
             other_sports: {
-                tenis_mesa: ['hugo_calderano'],
-                tenis_brasileiro: ['bia_haddad', 'thiago_monteiro'],
-                basquete: ['nba'],
-                eventos_especiais: ['copa_do_mundo', 'olimpiadas']
+                // Basketball
+                basketball: {
+                    nba: true,
+                    euroleague: true,
+                    nbb: true // Novo Basquete Brasil
+                },
+                // Tennis
+                tennis: {
+                    atp: true,
+                    wta: true,
+                    grand_slams: true
+                },
+                // Volleyball  
+                volleyball: {
+                    fivb: true,
+                    superliga_br: true
+                },
+                // Hockey
+                hockey: {
+                    nhl: true
+                },
+                // Baseball
+                baseball: {
+                    mlb: true
+                },
+                // American Football
+                american_football: {
+                    nfl: true
+                }
             },
             
             // Configurações de notificação
@@ -205,6 +240,38 @@ class DiscordStreamBot {
                     return await this.commandAmanha(message);
                 case '!ssemana':
                     return await this.commandSemana(message);
+                
+                // Basquete
+                case '!snba':
+                    return await this.sportsIntegration.commandNBA(message);
+                case '!snbb':
+                    return await this.sportsIntegration.commandNBB(message);
+                
+                // Tênis
+                case '!stenis':
+                    return await this.sportsIntegration.commandTenis(message);
+                case '!satp':
+                    return await this.sportsIntegration.commandATP(message);
+                case '!swta':
+                    return await this.sportsIntegration.commandWTA(message);
+                
+                // Volleyball
+                case '!svolley':
+                    return await this.sportsIntegration.commandVolleyball(message);
+                
+                // Hockey
+                case '!snhl':
+                    return await this.sportsIntegration.commandNHL(message);
+                
+                // Baseball
+                case '!smlb':
+                    return await this.sportsIntegration.commandMLB(message);
+                
+                // Football Americano
+                case '!snfl':
+                    return await this.sportsIntegration.commandNFL(message);
+                    
+                // Sistema
                 case '!sconfig':
                     return await this.commandConfig(message);
                 case '!shelp':
@@ -407,9 +474,12 @@ class DiscordStreamBot {
             .setFooter({ text: `Smart Stream Bot - Canal #${this.config.target_channel}` })
             .addFields(
                 { name: '📺 Streams', value: '`!saovivo` - Ver streamers online agora', inline: false },
-                { name: '⚽ Futebol', value: '`!shoje` - Jogos de hoje\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana', inline: false },
+                { name: '⚽ Futebol Brasileiro', value: '`!shoje` - Jogos de hoje\n`!samanha` - Jogos de amanhã\n`!ssemana` - Jogos da semana', inline: false },
+                { name: '🏀 Basquete', value: '`!snba` - Jogos da NBA\n`!snbb` - Basquete brasileiro', inline: false },
+                { name: '🎾 Tênis', value: '`!stenis` - Torneios ativos\n`!satp` - Ranking ATP\n`!swta` - Ranking WTA', inline: false },
+                { name: '🏐🏒⚾🏈 Outros', value: '`!svolley` - Volleyball\n`!snhl` - Hockey NHL\n`!smlb` - Baseball MLB\n`!snfl` - Football NFL', inline: false },
                 { name: '⚙️ Sistema', value: '`!sconfig` - Configurações do bot\n`!sstats` - Estatísticas\n`!sping` - Testar bot', inline: false },
-                { name: '💡 Dica', value: 'Use os comandos neste canal para obter informações em tempo real!', inline: false }
+                { name: '💡 Dica', value: 'Configure API_SPORTS_TOKEN no Railway para dados reais dos esportes!', inline: false }
             );
 
         await message.reply({ embeds: [embed] });
