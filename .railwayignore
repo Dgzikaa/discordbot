@@ -1,8 +1,5 @@
-Dockerfile*
-docker-compose*
-.dockerignore
-*.dockerfile
-.DS_Store
-.git/
 node_modules/
-*.log 
+*.log
+.git/
+.DS_Store
+.env 
