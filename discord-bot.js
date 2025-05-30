@@ -493,26 +493,8 @@ class DiscordStreamBot {
                 }
             }
 
-            // 5. CS2 ESPORTS - DADOS REAIS 2025
-            const cs2Games = await this.sportsIntegration.getCS2MatchesToday();
-            if (cs2Games.length > 0 && !cs2Games[0].isError) {
-                const gamesList = cs2Games.slice(0, 3).map(game => {
-                    let starsText = '';
-                    if (game.stars >= 4) starsText = '⭐⭐⭐⭐';
-                    else if (game.stars >= 3) starsText = '⭐⭐⭐';
-                    else if (game.stars >= 2) starsText = '⭐⭐';
-                    else starsText = '⭐';
-                    
-                    return `🕐 ${game.time} - ${starsText} **${game.homeTeam}** vs **${game.awayTeam}** (${game.league})`;
-                }).join('\n');
-                
-                embed.addFields({ 
-                    name: '🎮 CS2 ESPORTS (DADOS REAIS 2025)', 
-                    value: gamesList + '\n💡 Use `!scs2` para ver todos os jogos', 
-                    inline: false 
-                });
-                hasAnyGames = true;
-            }
+            // 5. ACABOU POR AQUI - SEM CS2
+            // Removido CS2 para voltar ao estado original
 
             if (!hasAnyGames) {
                 embed.addFields({ 
